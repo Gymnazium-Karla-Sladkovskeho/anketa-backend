@@ -1,9 +1,9 @@
 # anketa-backend
 
 
-<p align="center">
+<div align="center">
   <img src="https://fit.cvut.cz/static/images/fit-cvut-logo-cs.svg" alt="logo FIT ČVUT" height="200">
-</p>
+</div>
 
 Tento software vznikl za podpory **Fakulty informačních technologií ČVUT v Praze**.
 Více informací naleznete na [www.fit.cvut.cz](https://fit.cvut.cz).
