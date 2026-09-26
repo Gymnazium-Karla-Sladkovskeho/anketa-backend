@@ -1,0 +1,26 @@
+ktor:
+  deployment:
+    port: "$BACKEND_PORT"
+  application:
+    modules:
+      - cz.cvut.fit.gykas.ApplicationKt.module
+
+# Single source of truth: the .env file in the repository root (shared with
+# docker-compose.yml). The Gradle dotenv plugin (see build.gradle.kts) loads it
+# into the environment of run/test tasks; each "$VAR" below is a name from .env.
+# NOTE: Ktor substitutes a value only when the WHOLE value is "$VAR" — no
+# mid-string interpolation — so the JDBC url is composed in DatabaseFactory.
+postgres:
+  host: "$POSTGRES_HOST"
+  port: "$POSTGRES_PORT"
+  db: "$POSTGRES_DB"
+  user: "$POSTGRES_USER"
+  password: "$POSTGRES_PASSWORD"
+
+# JWT authentication (see core/plugins/Security.kt).
+# The defaults are for local development only — set JWT_SECRET in real deployments.
+jwt:
+  secret: "$JWT_SECRET:secret"
+  issuer: "$JWT_ISSUER:http://localhost:8080/"
+  audience: "$JWT_AUDIENCE:gykas"
+  realm: "$JWT_REALM:gykas"

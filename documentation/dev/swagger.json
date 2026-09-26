@@ -1,0 +1,2042 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "gykas",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/auth": {
+      "post": {
+        "tags": ["auth"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "summary": "přihlášení",
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "token_type": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJSUzI1NiJ9",
+                  "token_type": "Bearer",
+                  "expires_in": 86400
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "info o přihlášeném uživateli",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "lastname": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "name": "Martin",
+                  "lastname": "Kořínek",
+                  "role": "žák"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/password": {
+      "patch": {
+        "tags": ["auth"],
+        "summary": "změnit mé heslo",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content",
+            "content": { }
+          },
+          "400": {
+            "description": "Bad password (does not meet one or more conditions)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/password/{id}": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "restartovat heslo žáka / učitele",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "number"
+            },
+            "required": true
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+                "type": "string",
+                "enum": [
+                  "student",
+                  "teacher"
+                ]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": { 
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "username": "petr.pokorny",
+                  "password": "eyJhbGciOiJSUzI1NiJ9"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+
+    "/template": {
+      "post": {
+        "tags": ["template"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/template"
+              }
+            }
+          }
+        },
+        "summary": "vytvoření nové šablony ankety",
+        "responses": {
+          "201": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "tags": ["template"],
+        "summary": "zobrazení existujících šablon ankety",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "getAll",
+            "schema": {
+              "type": "boolean"
+            },
+            "required": true,
+            "description": "pokud je true, zahrnou se i globální šablony"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items":  {
+                    "$ref": "#/components/schemas/id_template_br"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/template/{id}": {
+      "get": {
+        "tags": ["template"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "zobrazení existující šablony ankety",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                    "$ref": "#/components/schemas/id_template"
+                  }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["template"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/template"
+              }
+            }
+          }
+        },
+        "summary": "změna existující šablony ankety",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["template"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "odstranění existující šablony ankety",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+
+    "/template/global": {
+      "post": {
+        "tags": ["template"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/template"
+              }
+            }
+          }
+        },
+        "summary": "vytvoření nové globální šablony ankety",
+        "responses": {
+          "201": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "tags": ["template"],
+        "summary": "zobrazení existujících globálních šablon ankety",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/id_template_br"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/template/global/{id}": {
+      "get": {
+        "tags": ["template"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "zobrazení existující globální šablony ankety",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_template"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["template"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/template"
+              }
+            }
+          }
+        },
+        "summary": "změna existující globální šablony ankety",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["template"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "odstranění existující globální šablony ankety",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+    "/teacher": {
+      "post": {
+        "tags": ["teacher"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/teacher"
+              }
+            }
+          }
+        },
+        "summary": "vytvoření nového učitele",
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": { 
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "username": "petr.pokorny",
+                  "password": "eyJhbGciOiJSUzI1NiJ9"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "tags": ["teacher"],
+        "summary": "zobrazení učitelů",
+        "parameters": [
+          {
+            "in": "query",
+            "required": false,
+            "name": "page",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "kolikátá stránka se zobrazí, výchozí hodnota je 1"
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "pageSize",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "jaká je velikost jedné stránky, výchozí hodnota je 25"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/id_teacher"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/teacher/{id}": {
+      "get": {
+        "tags": ["teacher"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "zobrazení existujícího učitele",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_teacher"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["teacher"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/teacher_pa"
+              }
+            }
+          }
+        },
+        "summary": "změna existujícího učitele",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["teacher"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "odstranění existujícího učitele",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+    "/student": {
+      "post": {
+        "tags": ["student"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/student"
+              }
+            }
+          }
+        },
+        "summary": "vytvoření nového studenta",
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": { 
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "username": "petr.pokorny_2019",
+                  "password": "eyJhbGciOiJSUzI1NiJ9"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "tags": ["student"],
+        "summary": "zobrazení studentů",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "classes",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "required": true,
+            "description": "seznam tříd, které se zobrazí"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/id_student"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/student/{id}": {
+      "get": {
+        "tags": ["student"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "zobrazení existujícího studenta",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_student"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["student"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/student"
+              }
+            }
+          }
+        },
+        "summary": "změna existujícího studenta",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["student"],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "odstranění existujícího studenta",
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+    "/student-list": {
+      "post": {
+        "tags": ["student-list"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/student_list_cr"
+              }
+            }
+          }
+        },
+        "summary": "vytvoření nového listu studentů",
+        "responses": {
+          "201": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "tags": ["student-list"],
+        "summary": "zobrazení listů studentů",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/id_student_list_br"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/student-list/{id}": {
+      "get": {
+        "tags": ["student-list"],
+          "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "zobrazení listu studentů",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_student_list"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "put": {
+        "tags": ["student-list"],
+        "summary": "změna listu studentů",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/student_list_cr"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["student-list"],
+        "summary": "odstranění listu studentů",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+    "/poll": {
+      "post": {
+        "tags": ["poll"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/poll_cr"
+              }
+            }
+          }
+        },
+        "summary": "vytvoření nové ankety",
+        "responses": {
+          "201": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      },
+      "get": {
+        "tags": ["poll"],
+        "summary": "zobrazení anket",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "groups",
+            "style": "form",
+            "explode": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "required": false,
+            "description": "seznam identifikátorů seznamů studentů, které se zobrazí, pokud není zadán, zobrazí se všechny dostupné skupiny"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/id_poll_br"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/poll/{id}": {
+      "post": {
+        "tags": ["poll"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/poll_resp_cr"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "summary": "odeslání odpovědi na anketu",
+        "responses": {
+          "201": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "get": {
+        "tags": ["poll"],
+        "summary": "zobrazení ankety, anketu může zobrazit i admin a student, pokud v ní může odpovídat",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_poll"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["poll"],
+        "summary": "upravení údajů ankety",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/poll_pa"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "400": {
+            "description": "Bad request (změna otázek po začátku ankety, neplatný datum konce)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["poll"],
+        "summary": "odstranění ankety",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+    "/poll/pdf/{id}": {
+      "get": {
+        "tags": ["poll"],
+        "summary": "stažení pdf výpisu ankety",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {
+                
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/poll/global": {
+      "get": {
+        "tags": ["poll"],
+        "summary": "administrátorské zobrazení všech anket",
+        "parameters": [
+          {
+            "in": "query",
+            "required": false,
+            "name": "id",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "explode": false,
+            "style": "form",
+            "description": "seznam identifikátorů učitelů, jejichž ankety se zobrazí, pokud není zadáno, zobrazí se všechny ankety"
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "page",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "kolikátá stránka se zobrazí, výchozí hodnota je 1"
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "pageSize",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "jaká je velikost jedné stránky, výchozí hodnota je 25"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_poll_br_scroll"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/poll/respondent": {
+      "get": {
+        "tags": ["poll"],
+        "summary": "studentské zobrazení všech anket",
+        "parameters": [
+          {
+            "in": "query",
+            "required": false,
+            "name": "page",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "kolikátá stránka se zobrazí, výchozí hodnota je 1"
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "pageSize",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "jaká je velikost jedné stránky, výchozí hodnota je 25"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/id_poll_br_scroll"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+
+    "/poll/{id}/response": {
+      "get": {
+        "tags": ["poll"],
+        "summary": "zobrazení odpovědí na anketu",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "id",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "page",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "kolikátá stránka se zobrazí, výchozí hodnota je 1"
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "pageSize",
+            "schema": {
+              "type": "number"
+            },
+            "explode": false,
+            "style": "form",
+            "description": "jaká je velikost jedné stránky, výchozí hodnota je 25"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/id_poll_resp"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "id_student": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "class": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "lastname"
+        ]
+      },
+      "student": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "class": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "lastname"
+        ]
+      },
+
+      "id_teacher": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "lastname",
+          "active"
+        ]
+      },
+      "teacher": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "lastname"
+        ]
+      },
+      "teacher_pa": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "lastname",
+          "active"
+        ]
+      },
+
+      "id_student_list": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/id_student"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "students"
+        ]
+      },
+      "student_list": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/id_student"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "students"
+        ]
+      },
+      "student_list_cr": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "students": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "students"
+        ]
+      },
+      "id_student_list_br": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "students"
+        ]
+      },
+
+      "question": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/open_question"
+          },
+          {
+            "$ref": "#/components/schemas/close_question"
+          },
+          {
+            "$ref": "#/components/schemas/numeric_question"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "OPEN": "#/components/schemas/open_question",
+            "CLOSE": "#/components/schemas/close_question",
+            "NUMERIC": "#/components/schemas/numeric_question"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "open_question": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "OPEN"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "close_question": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "OPEN"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "name", "choices"
+        ]
+      },
+      "numeric_question": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "OPEN"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+
+      "id_template": {
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/question"
+            }
+          }
+        }
+      },
+      "template": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/question"
+            }
+          }
+        }
+      },
+      "id_template_br": {
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+
+      "id_poll": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/question"
+            }
+          },
+          "teacher": {
+            "type": "object",
+            "$ref": "#/components/schemas/id_teacher"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "from",
+          "to",
+          "teacher"
+        ]
+      },
+      "id_poll_br": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "teacher": {
+            "type": "object",
+            "$ref": "#/components/schemas/id_teacher"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "from",
+          "to",
+          "teacher"
+        ]
+      },
+      "id_poll_br_scroll": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type":"number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "payload": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+               "id": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "from": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "to": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "teacher": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/id_teacher"
+                }
+              }
+            }
+          }
+          
+        },
+        "required": [
+          "id",
+          "name",
+          "from",
+          "to",
+          "teacher"
+        ]
+      },
+      "poll_cr": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/question"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "from",
+          "to"
+        ]
+      },
+      "poll_pa": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/question"
+            }
+          }
+        }
+      },
+      "poll_resp_cr": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": [
+                "answer"
+              ]
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ]
+      },
+      "id_poll_resp": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ],
+              "required": [
+                "answer"
+              ]
+            }
+          }
+        },
+        "required": [
+          "answers"
+        ]
+      }
+    }
+  }
+}
