@@ -1,15 +1,21 @@
 ktor:
   deployment:
-    port: 8080
+    port: "$PORT:8080"
   application:
     modules:
-      - cz.cvut.fit.gykas.anketa.ApplicationKt.module
+      - cz.cvut.fit.gykas.ApplicationKt.module
 
-# Embedded H2 (in-memory). For a persistent file-based H2 use
-# "jdbc:h2:./data/anketa", for another database change the URL + driver
-# and add its JDBC driver dependency in build.gradle.kts.
-database:
-  url: "jdbc:h2:mem:anketa;DB_CLOSE_DELAY=-1"
-  driver: "org.h2.Driver"
-  user: "sa"
-  password: ""
+# Values match docker-compose.yml + .env one folder above this project.
+# Each value can be overridden by an environment variable.
+postgres:
+  url: "$DB_URL:jdbc:postgresql://localhost:5432/gykasDB"
+  user: "$DB_USER:user"
+  password: "$DB_PASSWORD:password"
+
+# JWT authentication (see core/plugins/Security.kt).
+# The defaults are for local development only — set JWT_SECRET in real deployments.
+jwt:
+  secret: "$JWT_SECRET:secret"
+  issuer: "$JWT_ISSUER:http://localhost:8080/"
+  audience: "$JWT_AUDIENCE:gykas"
+  realm: "$JWT_REALM:gykas"
