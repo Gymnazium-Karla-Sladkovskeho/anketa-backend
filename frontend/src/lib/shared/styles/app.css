@@ -1,0 +1,9 @@
+@import "tailwindcss" source("../../../");
+
+@theme {
+	--color-brand-orange: rgb(233 109 38);
+	--color-brand-gray: rgb(110 110 110);
+	--color-brand-gold: rgb(177 145 41);
+	--color-brand-purple: rgb(126 63 152);
+	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
