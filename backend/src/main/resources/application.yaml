@@ -1,0 +1,15 @@
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - cz.cvut.fit.gykas.anketa.ApplicationKt.module
+
+# Embedded H2 (in-memory). For a persistent file-based H2 use
+# "jdbc:h2:./data/anketa", for another database change the URL + driver
+# and add its JDBC driver dependency in build.gradle.kts.
+database:
+  url: "jdbc:h2:mem:anketa;DB_CLOSE_DELAY=-1"
+  driver: "org.h2.Driver"
+  user: "sa"
+  password: ""
