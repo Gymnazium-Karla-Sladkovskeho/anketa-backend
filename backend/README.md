@@ -102,12 +102,20 @@ src/main/kotlin/cz/cvut/fit/gykas/
 │     └─ Routing.kt                 # GET / smoke-test route (no DB) + /static
 └─ features/
    └─ user/                         # one vertical slice; copy this to add a new feature
-      ├─ User.kt                    # domain model
-      ├─ UserDto.kt                 # UserRequest / UserResponse (+ domain → DTO mapping)
-      ├─ UserTable.kt               # Exposed table object + DAO entity (the ORM mapping)
-      ├─ UserRepository.kt          # persistence: PostgreSQL via Exposed DAO (ORM) API
-      ├─ UserService.kt             # business logic (place for validation/rules)
-      └─ UserRoutes.kt              # fun Application.userModule(service) — /users CRUD routes
+      ├─ application                # usecases
+         └─ UserService.kt          # business logic (place for validation/rules)
+      ├─ domain                     # domain models
+         ├─ User.kt
+         └─ UserRepository.kt       # adapter (interface)
+      ├─ infrastructure             # external dependencies (db, redis, firebase, ...)
+         ├─ UserTable.kt            # table
+         └─ UserRepositoryImpl.kt   # impl specific (db)
+      └─ presentation               # crud routes, dto, mappings
+         ├─ dto                     # dtos, forms
+            ├─ UserRequest
+            ├─ UserResponse
+            └─ Mapping              # mappings
+         └─ UserRoutes.kt           # /users CRUD routes
 
 src/main/resources/
 ├─ application.yaml                 # ktor modules + postgres.* and jwt.* config (env-overridable)
@@ -196,9 +204,9 @@ connection) is **not** loaded — the test installs only `configureRouting()` an
 - **`User.kt`** — plain domain model (`data class User(id, name, email)`), independent of HTTP and DB.
 - **`UserTable.kt`** — Exposed `IntIdTable` object (`users` table) **and** the DAO entity
   `UserEntity : IntEntity` with `toDomain()` mapping. This is the ORM part of Exposed.
-- **`UserDto.kt`** — `@Serializable UserRequest` (POST/PUT body) and `UserResponse` (API output) so
+- **`Mapping.kt`** — `@Serializable UserRequest` (POST/PUT body) and `UserResponse` (API output) so
   the domain model never leaks into the API.
-- **`UserRepository.kt`** — persistence (`findAll`, `findById`, `create`, `update`, `delete`) using
+- **`UserRepositoryImpl.kt`** — persistence (`findAll`, `findById`, `create`, `update`, `delete`) using
   the Exposed DAO API inside `dbQuery`, e.g.:
 
   ```kotlin
@@ -297,7 +305,7 @@ Ktor artifacts come from the Ktor version catalog (`io.ktor:ktor-version-catalog
   catalog, no extra version to manage); the project is expected to grow, so DI is in place from the
   start. (Third-party alternatives like Koin would work the same way, with more features but an
   extra dependency.)
-- **Single `UserRepository` class, no interface + implementation split** — with exactly one
+- **Single `UserRepositoryImpl` class, no interface + implementation split** — with exactly one
   persistence backend, an interface would be indirection without payoff (YAGNI), so the repository is
   one concrete class. If you later need a second backend or fakes for tests, extract an interface
   from it (a one-click IDE refactoring).
