@@ -1,4 +1,8 @@
-package cz.cvut.fit.gykas.features.user
+package cz.cvut.fit.gykas.features.user.application
+
+import cz.cvut.fit.gykas.features.user.domain.User
+import cz.cvut.fit.gykas.features.user.domain.UserRepository
+import cz.cvut.fit.gykas.features.user.presentation.dto.UserRequest
 
 /** Business logic of the user feature. Currently a thin pass-through over the
  *  repository — this is where validation and domain rules should live. */

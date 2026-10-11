@@ -1,4 +1,4 @@
-package cz.cvut.fit.gykas.features.user
+package cz.cvut.fit.gykas.features.user.domain
 
 /** Domain model of the user feature. */
 data class User(

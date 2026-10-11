@@ -1,5 +1,6 @@
-package cz.cvut.fit.gykas.features.user
+package cz.cvut.fit.gykas.features.user.infrastructure
 
+import cz.cvut.fit.gykas.features.user.domain.User
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
 import org.jetbrains.exposed.v1.dao.IntEntity

@@ -6,9 +6,9 @@ import cz.cvut.fit.gykas.core.plugins.configureRouting
 import cz.cvut.fit.gykas.core.plugins.configureSecurity
 import cz.cvut.fit.gykas.core.plugins.configureSerialization
 import cz.cvut.fit.gykas.core.plugins.configureStatusPages
-import cz.cvut.fit.gykas.features.user.UserRepository
-import cz.cvut.fit.gykas.features.user.UserService
-import cz.cvut.fit.gykas.features.user.userModule
+import cz.cvut.fit.gykas.features.user.infrastructure.UserRepositoryImpl
+import cz.cvut.fit.gykas.features.user.application.UserService
+import cz.cvut.fit.gykas.features.user.presentation.userModule
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.di.*
 
@@ -20,7 +20,7 @@ fun Application.module() {
     // Dependency injection via Ktor's built-in DI plugin (ktor-server-di):
     // dependencies are registered once here and injected at module boundaries.
     dependencies {
-        provide { UserRepository() }
+        provide { UserRepositoryImpl() }
         provide { UserService(resolve()) }
     }
 

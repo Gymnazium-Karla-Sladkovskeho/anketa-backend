@@ -1,5 +1,9 @@
-package cz.cvut.fit.gykas.features.user
+package cz.cvut.fit.gykas.features.user.presentation
 
+import cz.cvut.fit.gykas.features.user.application.UserService
+import cz.cvut.fit.gykas.features.user.domain.User
+import cz.cvut.fit.gykas.features.user.presentation.dto.UserRequest
+import cz.cvut.fit.gykas.features.user.presentation.dto.toResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.request.receive
