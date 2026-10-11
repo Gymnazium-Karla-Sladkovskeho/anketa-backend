@@ -2,6 +2,14 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(ktorLibs.plugins.ktor)
     alias(libs.plugins.kotlin.serialization)
+    // Loads ../.env into the environment of run/test tasks, so application.yaml's
+    // "$VAR" substitution and docker-compose share one source of truth: the .env
+    // file in the repository root. (Real environment variables still work.)
+    id("io.github.dsdolzhenko.dotenv") version "0.1.0"
+}
+
+dotenv {
+    files.set(listOf("../.env"))
 }
 
 group = "cz.cvut.fit"

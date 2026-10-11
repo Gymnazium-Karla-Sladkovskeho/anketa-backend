@@ -15,15 +15,23 @@ object DatabaseFactory {
 
     /**
      * Connects to PostgreSQL using the `postgres.*` keys from application.yaml
-     * (which can be overridden by the DB_URL / DB_USER / DB_PASSWORD environment
-     * variables) and creates the tables.
+     * (which resolve from the .env file / environment — see build.gradle.kts)
+     * and creates the tables.
+     *
+     * The JDBC url is composed here because Ktor's yaml substitution only
+     * supports whole-value "$VAR" references, not mid-string interpolation.
      *
      * Template shortcut: [SchemaUtils.create] on startup.
      * For a real project use migrations (e.g. Flyway) instead.
      */
     fun init(config: ApplicationConfig) {
+        val url = "jdbc:postgresql://" +
+            config.property("postgres.host").getString() + ":" +
+            config.property("postgres.port").getString() + "/" +
+            config.property("postgres.db").getString()
+
         database = Database.connect(
-            url = config.property("postgres.url").getString(),
+            url = url,
             driver = "org.postgresql.Driver",
             user = config.property("postgres.user").getString(),
             password = config.property("postgres.password").getString(),

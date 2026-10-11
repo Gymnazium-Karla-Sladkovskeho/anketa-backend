@@ -14,7 +14,8 @@ and serves as the template for new features. Starter plugins are wired in minima
 
 Prerequisites: JDK 21 (Gradle auto-provisions a toolchain via the foojay resolver if needed) and a
 PostgreSQL database. The database runs from the compose file **one folder above** this project
-(`../docker-compose.yml`, credentials in `../.env`):
+(`../docker-compose.yml`, credentials in `../.env` — the backend reads the same file automatically
+via a Gradle dotenv plugin, nothing to export):
 
 ```bash
 # from the repository root (one folder up)
@@ -156,8 +157,9 @@ fun Application.module() {
 
 ### `core/database/DatabaseFactory.kt`
 
-- Reads `postgres.url` / `postgres.user` / `postgres.password` from `application.yaml` and connects
-  via `org.jetbrains.exposed.v1.jdbc.Database.connect` with the PostgreSQL JDBC driver.
+- Composes the JDBC url from `postgres.host` / `postgres.port` / `postgres.db` (Ktor yaml
+  substitution is whole-value only) and connects via `org.jetbrains.exposed.v1.jdbc.Database.connect`
+  with `postgres.user` / `postgres.password`.
 - Creates tables on startup with `SchemaUtils.create(UserTable)` — **template shortcut**; use a
   migration tool (e.g. Flyway) in a real project.
 - Exposes `dbQuery { ... }`, a thin wrapper over Exposed's coroutine-safe
@@ -217,18 +219,18 @@ connection) is **not** loaded — the test installs only `configureRouting()` an
 ```yaml
 ktor:
   deployment:
-    port: "$PORT:8080"
+    port: "$BACKEND_PORT"
   application:
     modules:
       - cz.cvut.fit.gykas.ApplicationKt.module
 
-# Values match docker-compose.yml + .env one folder above this project.
 postgres:
-  url: "$DB_URL:jdbc:postgresql://localhost:5432/gykasDB"
-  user: "$DB_USER:user"
-  password: "$DB_PASSWORD:password"
+  host: "$POSTGRES_HOST"
+  port: "$POSTGRES_PORT"
+  db: "$POSTGRES_DB"
+  user: "$POSTGRES_USER"
+  password: "$POSTGRES_PASSWORD"
 
-# JWT authentication (see core/plugins/Security.kt).
 jwt:
   secret: "$JWT_SECRET:secret"
   issuer: "$JWT_ISSUER:http://localhost:8080/"
@@ -236,13 +238,19 @@ jwt:
   realm: "$JWT_REALM:gykas"
 ```
 
-Ktor's `$ENV_VAR:default` syntax means it works out of the box against the compose database, and can
-be overridden via environment variables (`PORT`, `DB_URL`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`,
-`JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_REALM`) without code changes.
+**Single source of truth: the `.env` file in the repository root** (the same file docker-compose
+reads). The [io.github.dsdolzhenko.dotenv](https://plugins.gradle.org/plugin/io.github.dsdolzhenko.dotenv)
+Gradle plugin loads `../.env` into the environment of the `run`/`test` tasks (see
+`build.gradle.kts`), so every `"$VAR"` above resolves from `.env` when started via `./gradlew run`.
+Every `$VAR` name here exists in `.env` — real environment variables still override it in
+deployment. Note: Ktor substitutes only **whole-value** `"$VAR"` references (no mid-string
+interpolation), which is why the JDBC url is composed from parts in `DatabaseFactory`.
 
 ### `build.gradle.kts` (changed)
 
-Dependencies: Ktor + Exposed + PostgreSQL, plus the starter plugins, minimally wired:
+The `io.github.dsdolzhenko.dotenv` Gradle plugin is applied and pointed at `../.env`
+(`dotenv { files.set(listOf("../.env")) }`), which loads it into the environment of the `run`/`test`
+tasks. Dependencies: Ktor + Exposed + PostgreSQL, plus the starter plugins, minimally wired:
 
 ```kotlin
 dependencies {
@@ -297,9 +305,12 @@ Ktor artifacts come from the Ktor version catalog (`io.ktor:ktor-version-catalog
   API. The template uses the **DAO API** (`IntEntity`, `EntityClass`) since the goal is ORM usage,
   with the classic blocking **JDBC** driver wrapped in `suspendTransaction` for coroutine safety.
   The R2DBC variant was removed to keep a single, simple stack.
-- **PostgreSQL config matches `../docker-compose.yml` + `../.env`**
-  (`user` / `password` / `gykasDB`, port `5432`), overridable by env vars — no secrets invented, no
-  code change needed for other environments.
+- **Single source of truth for environment values: `../.env`** — loaded into the `run`/`test` task
+  environment by the `io.github.dsdolzhenko.dotenv` Gradle plugin, so the backend and
+  docker-compose always agree (Ktor itself has no dotenv mechanism; its yaml substitution only sees
+  process env vars). Defaults after `:` exist only where a sensible dev fallback exists (JWT); the
+  database and port have none — if `.env` is missing, startup fails fast and loudly. Running outside
+  Gradle (`java -jar`) needs real env vars instead (e.g. `env_file:` in compose).
 - **Schema auto-creation on startup** (`SchemaUtils.create`) — keeps the template self-contained and
   runnable with zero setup; documented in-code that migrations (Flyway) belong in real projects.
 - **All starter plugins are kept, minimally wired** — DI, Status Pages, JWT auth, Swagger UI, static
@@ -374,6 +385,7 @@ The `users` table was also inspected in PostgreSQL (`\d users`): columns `id` (s
 |------------------|----------|
 | Kotlin           | 2.4.0    |
 | Ktor             | 3.6.0    |
+| dotenv (Gradle plugin) | 0.1.0 |
 | Exposed          | 1.3.1    |
 | PostgreSQL JDBC  | 42.7.13  |
 | Logback          | 1.5.37   |
