@@ -1,6 +1,6 @@
 ktor:
   deployment:
-    port: "$PORT:8080"
+    port: "$BACKEND_PORT"
   application:
     modules:
       - cz.cvut.fit.gykas.ApplicationKt.module
@@ -8,9 +8,9 @@ ktor:
 # Values match docker-compose.yml + .env one folder above this project.
 # Each value can be overridden by an environment variable.
 postgres:
-  url: "$DB_URL:jdbc:postgresql://localhost:5432/gykasDB"
-  user: "$DB_USER:user"
-  password: "$DB_PASSWORD:password"
+  url: "jdbc:postgresql://$POSTGRES_HOST:${POSTGRES_PORT}/${POSTGRES_DB}"
+  user: "$POSTGRES_USER"
+  password: "$POSTGRES_PASSWORD"
 
 # JWT authentication (see core/plugins/Security.kt).
 # The defaults are for local development only — set JWT_SECRET in real deployments.
