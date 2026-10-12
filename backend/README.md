@@ -148,7 +148,7 @@ fun Application.module() {
     DatabaseFactory.init(environment.config)          // infrastructure
 
     dependencies {                                    // ktor-server-di registry
-        provide { UserRepository() }
+        provide { UserRepositoryImpl() }               // Exposed adapter implements UserRepository
         provide { UserService(resolve()) }
     }
 
@@ -204,8 +204,8 @@ connection) is **not** loaded — the test installs only `configureRouting()` an
 - **`User.kt`** — plain domain model (`data class User(id, name, email)`), independent of HTTP and DB.
 - **`UserTable.kt`** — Exposed `IntIdTable` object (`users` table) **and** the DAO entity
   `UserEntity : IntEntity` with `toDomain()` mapping. This is the ORM part of Exposed.
-- **`Mapping.kt`** — `@Serializable UserRequest` (POST/PUT body) and `UserResponse` (API output) so
-  the domain model never leaks into the API.
+- **`UserRequest.kt` / `UserResponse.kt`** — serializable HTTP request and response DTOs, so the
+  domain model never leaks into the API. **`Mapping.kt`** maps a domain `User` to `UserResponse`.
 - **`UserRepositoryImpl.kt`** — persistence (`findAll`, `findById`, `create`, `update`, `delete`) using
   the Exposed DAO API inside `dbQuery`, e.g.:
 
@@ -305,10 +305,11 @@ Ktor artifacts come from the Ktor version catalog (`io.ktor:ktor-version-catalog
   catalog, no extra version to manage); the project is expected to grow, so DI is in place from the
   start. (Third-party alternatives like Koin would work the same way, with more features but an
   extra dependency.)
-- **Single `UserRepositoryImpl` class, no interface + implementation split** — with exactly one
-  persistence backend, an interface would be indirection without payoff (YAGNI), so the repository is
-  one concrete class. If you later need a second backend or fakes for tests, extract an interface
-  from it (a one-click IDE refactoring).
+- **Repository interface and implementation are separate** — `UserRepository` in `domain` is the
+  persistence port used by `UserService`; `UserRepositoryImpl` in `infrastructure` implements that
+  contract with Exposed/PostgreSQL. `Application.module()` registers the implementation in Ktor DI.
+  This keeps application code dependent on the contract rather than the database adapter and allows
+  tests or another backend to provide a different implementation.
 - **Exposed DAO = the ORM** — Exposed ships two APIs: the SQL-like DSL and the DAO (ORM-style entity)
   API. The template uses the **DAO API** (`IntEntity`, `EntityClass`) since the goal is ORM usage,
   with the classic blocking **JDBC** driver wrapped in `suspendTransaction` for coroutine safety.
