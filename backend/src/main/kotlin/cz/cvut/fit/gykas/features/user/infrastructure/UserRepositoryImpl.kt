@@ -4,8 +4,6 @@ import cz.cvut.fit.gykas.core.database.dbQuery
 import cz.cvut.fit.gykas.features.user.domain.User
 import cz.cvut.fit.gykas.features.user.domain.UserRepository
 
-/** Persistence of the user feature: PostgreSQL via the Exposed DAO (ORM-style) API.
- *  If you ever need a second backend or fakes for tests, extract an interface from this class. */
 class UserRepositoryImpl : UserRepository {
 
     override suspend fun findAll(): List<User> = dbQuery {
@@ -16,18 +14,27 @@ class UserRepositoryImpl : UserRepository {
         UserEntity.findById(id)?.toDomain()
     }
 
-    override suspend fun create(name: String, email: String): User = dbQuery {
-        UserEntity.new {
-            this.name = name
-            this.email = email
-        }.toDomain()
+    override suspend fun update(
+        id: Int,
+        firstName: String?,
+        lastName: String?,
+        passwordHash: String?
+    ): User? = dbQuery {
+        UserEntity.findById(id)?.apply {
+            firstName?.let { this.firstName = it }
+            lastName?.let { this.lastName = it }
+            passwordHash?.let { this.passwordHash = it }
+        }?.toDomain()
     }
 
-    override suspend fun update(id: Int, name: String, email: String): User? = dbQuery {
-        UserEntity.findByIdAndUpdate(id) {
-            it.name = name
-            it.email = email
-        }?.toDomain()
+    override suspend fun create(firstName: String,
+                                lastName: String,
+                                passwordHash: String): User = dbQuery {
+        UserEntity.new {
+            this.firstName = firstName
+            this.lastName = lastName
+            this.passwordHash = passwordHash
+        }.toDomain()
     }
 
     override suspend fun delete(id: Int): Boolean = dbQuery {

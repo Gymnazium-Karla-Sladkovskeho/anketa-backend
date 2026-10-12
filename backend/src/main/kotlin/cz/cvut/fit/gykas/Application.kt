@@ -7,8 +7,8 @@ import cz.cvut.fit.gykas.core.plugins.configureSecurity
 import cz.cvut.fit.gykas.core.plugins.configureSerialization
 import cz.cvut.fit.gykas.core.plugins.configureStatusPages
 import cz.cvut.fit.gykas.features.user.infrastructure.UserRepositoryImpl
-import cz.cvut.fit.gykas.features.user.application.UserService
-import cz.cvut.fit.gykas.features.user.presentation.userModule
+import cz.cvut.fit.gykas.features.auth.application.AuthService
+import cz.cvut.fit.gykas.features.auth.presentation.authModule
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.di.*
 
@@ -21,7 +21,7 @@ fun Application.module() {
     // dependencies are registered once here and injected at module boundaries.
     dependencies {
         provide { UserRepositoryImpl() }
-        provide { UserService(resolve()) }
+        provide { AuthService(resolve()) }
     }
 
     // Cross-cutting plugins
@@ -32,6 +32,6 @@ fun Application.module() {
     configureHttp()
 
     // Feature modules — resolved from the registry, still passed explicitly
-    val userService: UserService by dependencies
-    userModule(userService)
+    val userService: AuthService by dependencies
+    authModule(userService)
 }

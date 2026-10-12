@@ -218,8 +218,8 @@ connection) is **not** loaded — the test installs only `configureRouting()` an
   }
   ```
 
-- **`UserService.kt`** — business logic layer (currently a pass-through; add validation/rules here).
-- **`UserRoutes.kt`** — `fun Application.userModule(service: UserService)` with REST CRUD under
+- **`AuthService.kt`** — business logic layer (currently a pass-through; add validation/rules here).
+- **`AuthRoutes.kt`** — `fun Application.userModule(service: UserService)` with REST CRUD under
   `/users`; maps domain results to status codes (201/200/204/400/404).
 
 ### `src/main/resources/application.yaml`
@@ -306,7 +306,7 @@ Ktor artifacts come from the Ktor version catalog (`io.ktor:ktor-version-catalog
   start. (Third-party alternatives like Koin would work the same way, with more features but an
   extra dependency.)
 - **Repository interface and implementation are separate** — `UserRepository` in `domain` is the
-  persistence port used by `UserService`; `UserRepositoryImpl` in `infrastructure` implements that
+  persistence port used by `AuthService`; `UserRepositoryImpl` in `infrastructure` implements that
   contract with Exposed/PostgreSQL. `Application.module()` registers the implementation in Ktor DI.
   This keeps application code dependent on the contract rather than the database adapter and allows
   tests or another backend to provide a different implementation.
