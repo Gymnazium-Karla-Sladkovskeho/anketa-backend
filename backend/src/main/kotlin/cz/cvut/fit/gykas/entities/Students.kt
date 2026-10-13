@@ -1,8 +1,19 @@
 package cz.cvut.fit.gykas.entities
 
-import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+import org.jetbrains.exposed.v1.core.dao.id.CompositeID
+import org.jetbrains.exposed.v1.core.dao.id.CompositeIdTable
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.dao.CompositeEntity
+import org.jetbrains.exposed.v1.dao.CompositeEntityClass
 
-object Students : IntIdTable("students") {
-    val classes = reference("classes_id", Classes)
-    val users = reference("users_id", Users)
+object Students : CompositeIdTable("students") {
+    val schoolClass = integer("id").entityId().references(Classes.id)
+    val user = integer("users_id").entityId().references(Users.id)
+    override val primaryKey = PrimaryKey(schoolClass, user)
+}
+
+class StudentEntity(id: EntityID<CompositeID>) : CompositeEntity(id) {
+    companion object : CompositeEntityClass<StudentEntity>(Students)
+    var schoolClass by ClassEntity referencedOn Students.schoolClass
+    var user by UserEntity referencedOn Students.user
 }
