@@ -7,5 +7,5 @@ import org.jetbrains.exposed.v1.dao.IntEntityClass
 class StudentEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<StudentEntity>(Students)
 
-    val class by cz.cvut.fit.gykas.entities.ClassEntity referencedOn Students.classes
+    val Class by ClassEntity referencedOn Students.classes
 }
