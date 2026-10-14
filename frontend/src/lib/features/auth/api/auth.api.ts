@@ -1,6 +1,6 @@
-import { api } from '$lib/shared/api';
-import { USE_MOCKS } from '$lib/shared/constants';
-import { sleep } from '$lib/shared/utils';
+import { api } from '$lib/core/api';
+import { USE_MOCKS } from '$lib/core/constants';
+import { sleep } from '$lib/core/utils';
 import type { Credentials, User } from '../model/types';
 
 export async function login(c: Credentials): Promise<User> {
