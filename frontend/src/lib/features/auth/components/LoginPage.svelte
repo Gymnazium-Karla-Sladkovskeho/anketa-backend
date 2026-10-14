@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Button } from '$lib/shared/ui';
-	import { dotsAnchor } from '$lib/shared/brand-dots';
-	import { t } from '$lib/shared/i18n/index.svelte';
+	import { Button } from '$lib/core/ui';
+	import { t } from '$lib/core/i18n/index.svelte';
 	import { login as loginRequest } from '../api/auth.api';
 	import { session } from '../model/session.svelte';
 	import { homeFor } from '../model/routes';
@@ -32,14 +31,10 @@
 </script>
 
 <main class="flex min-h-screen flex-col items-center justify-center gap-10">
-	<!-- The dots live here: a fixed-size slot in the normal flow, so the layout never shifts. -->
-	<div class="size-30" use:dotsAnchor={{ preset: status === 'loading' ? 'loading' : 'logo' }}></div>
-
 	<form
 		onsubmit={handleSubmit}
 		inert={status === 'loading'}
 		class="flex flex-col items-center gap-4"
-		class:invisible={status === 'loading'}
 	>
 		<label class="sr-only" for="login">{t('login.login')}</label>
 		<input
@@ -60,6 +55,6 @@
 			class="w-80 rounded-lg border border-slate-300 px-4 py-2"
 		/>
 		<p class="min-h-6 text-sm text-red-600" role="alert">{status === 'error' ? errorText : ''}</p>
-		<Button type="submit">{t('login.submit')}</Button>
+		<Button type="submit" disabled={status === 'loading'}>{t('login.submit')}</Button>
 	</form>
 </main>

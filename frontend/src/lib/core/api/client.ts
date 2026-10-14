@@ -1,4 +1,4 @@
-import { API_URL } from '$lib/shared/constants';
+import { API_URL } from '$lib/core/constants';
 
 export class ApiError extends Error {
 	constructor(
