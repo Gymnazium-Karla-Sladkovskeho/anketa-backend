@@ -1,7 +1,7 @@
 package cz.cvut.fit.gykas.features.auth.application
 
-import cz.cvut.fit.gykas.features.user.domain.User
-import cz.cvut.fit.gykas.features.user.domain.UserRepository
+import cz.cvut.fit.gykas.features.auth.domain.User
+import cz.cvut.fit.gykas.features.auth.domain.UserRepository
 
 class AuthService(private val repository: UserRepository) {
     suspend fun getById(id: Int): User? = repository.findById(id)

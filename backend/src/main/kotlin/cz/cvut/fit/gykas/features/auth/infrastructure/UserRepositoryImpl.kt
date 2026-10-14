@@ -1,8 +1,8 @@
-package cz.cvut.fit.gykas.features.user.infrastructure
+package cz.cvut.fit.gykas.features.auth.infrastructure
 
 import cz.cvut.fit.gykas.core.database.dbQuery
-import cz.cvut.fit.gykas.features.user.domain.User
-import cz.cvut.fit.gykas.features.user.domain.UserRepository
+import cz.cvut.fit.gykas.features.auth.domain.User
+import cz.cvut.fit.gykas.features.auth.domain.UserRepository
 
 class UserRepositoryImpl : UserRepository {
 

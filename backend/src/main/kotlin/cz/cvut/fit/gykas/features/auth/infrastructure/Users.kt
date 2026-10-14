@@ -1,5 +1,6 @@
-package cz.cvut.fit.gykas.entities
+package cz.cvut.fit.gykas.features.auth.infrastructure
 
+import cz.cvut.fit.gykas.features.auth.domain.User
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
 import org.jetbrains.exposed.v1.dao.IntEntity
@@ -17,3 +18,5 @@ class UserEntity(id: EntityID<Int>) : IntEntity(id) {
     var lastName by Users.lastName
     var passwordHash by Users.passwordHash
 }
+
+fun UserEntity.toDomain(): User = User(id.value, firstName, lastName, passwordHash)

@@ -1,4 +1,4 @@
-package cz.cvut.fit.gykas.features.user.domain
+package cz.cvut.fit.gykas.features.auth.domain
 
 data class User(
     val id: Int,

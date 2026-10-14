@@ -1,6 +1,6 @@
 package cz.cvut.fit.gykas.core.database
 
-import cz.cvut.fit.gykas.features.user.infrastructure.UserTable
+import cz.cvut.fit.gykas.features.auth.infrastructure.Users
 import io.ktor.server.config.ApplicationConfig
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
@@ -38,7 +38,7 @@ object DatabaseFactory {
         )
 
         transaction(database) {
-            SchemaUtils.create(UserTable)
+            SchemaUtils.create(Users)
         }
     }
 }
