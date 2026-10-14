@@ -19,11 +19,11 @@ import io.ktor.server.plugins.di.*
  * No routes are protected by default — wrap routes in `authenticate("auth-jwt") { ... }`
  * to require a valid token.
  */
-fun Application.configureSecurity(jwtProvider: JwtProvider) {
+fun Application.configureSecurity() {
     val jwtRealm = environment.config.property("jwt.realm").getString()
 
     dependencies {
-        provide<JwtProvider> { JwtProviderImpl(resolve()) }
+        provide<JwtProvider> { JwtProviderImpl(this@configureSecurity.environment.config) }
         provide<PasswordHashProvider> {
             val argon2 = Argon2Factory.create()
             val memory = 65536
@@ -33,6 +33,8 @@ fun Application.configureSecurity(jwtProvider: JwtProvider) {
             ArgonHashProvider(argon2, iterations, memory, parallelism)
         }
     }
+
+    val jwtProvider: JwtProvider by dependencies
 
     authentication {
         bearer("auth-bearer") {

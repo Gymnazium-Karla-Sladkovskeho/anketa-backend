@@ -1,10 +1,15 @@
 package cz.cvut.fit.gykas.features.auth.application
 
+import cz.cvut.fit.gykas.core.auth.AuthUser
+import cz.cvut.fit.gykas.core.auth.JwtProvider
+import cz.cvut.fit.gykas.core.auth.JwtToken
 import cz.cvut.fit.gykas.features.auth.domain.User
 import cz.cvut.fit.gykas.features.auth.domain.UserRepository
 
 class AuthService(private val repository: UserRepository,
-                  private val hashProvider: PasswordHashProvider)
+                  private val hashProvider: PasswordHashProvider,
+                  private val jwtProvider: JwtProvider
+)
 {
     suspend fun getById(id: Int): User? = repository.findById(id)
 
@@ -22,7 +27,7 @@ class AuthService(private val repository: UserRepository,
         if (users.size == 1) return users.first()
         if (spl.size == 2) return users.first()
 
-        return users.getOrNull(spl[2].toIntOrNull() ?: return null)
+        return repository.findById(spl[2].toIntOrNull() ?: return null)
     }
 
     suspend fun resetPassword(id: Int, len: Int): String? =
@@ -43,4 +48,7 @@ class AuthService(private val repository: UserRepository,
         with(getById(id)?.passwordHash ?: return false) {
             hashProvider.verify(this, password)
         }
+
+    fun createToken(username: String, roles: Set<String>): JwtToken =
+        jwtProvider.generateToken(AuthUser(username, roles))
 }

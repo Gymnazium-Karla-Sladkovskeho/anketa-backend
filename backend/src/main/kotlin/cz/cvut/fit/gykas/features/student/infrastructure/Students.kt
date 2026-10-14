@@ -1,5 +1,7 @@
-package cz.cvut.fit.gykas.entities
+package cz.cvut.fit.gykas.features.student.infrastructure
 
+import cz.cvut.fit.gykas.entities.ClassEntity
+import cz.cvut.fit.gykas.entities.Classes
 import cz.cvut.fit.gykas.features.auth.infrastructure.UserEntity
 import cz.cvut.fit.gykas.features.auth.infrastructure.Users
 import org.jetbrains.exposed.v1.core.dao.id.CompositeID
@@ -16,6 +18,6 @@ object Students : CompositeIdTable("students") {
 
 class StudentEntity(id: EntityID<CompositeID>) : CompositeEntity(id) {
     companion object : CompositeEntityClass<StudentEntity>(Students)
-    var schoolClass by ClassEntity referencedOn Students.schoolClass
+    var schoolClass by ClassEntity.Companion referencedOn Students.schoolClass
     var user by UserEntity referencedOn Students.user
 }

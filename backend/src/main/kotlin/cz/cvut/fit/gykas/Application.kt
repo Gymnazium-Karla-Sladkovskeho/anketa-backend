@@ -11,6 +11,8 @@ import cz.cvut.fit.gykas.core.plugins.configureStatusPages
 import cz.cvut.fit.gykas.features.auth.infrastructure.UserRepositoryImpl
 import cz.cvut.fit.gykas.features.auth.application.AuthService
 import cz.cvut.fit.gykas.features.auth.application.PasswordHashProvider
+import cz.cvut.fit.gykas.features.auth.application.RoleService
+import cz.cvut.fit.gykas.features.auth.domain.UserRepository
 import cz.cvut.fit.gykas.features.auth.infrastructure.ArgonHashProvider
 import cz.cvut.fit.gykas.features.auth.presentation.authModule
 import de.mkammerer.argon2.Argon2Factory
@@ -25,19 +27,20 @@ fun Application.module() {
     // Dependency injection via Ktor's built-in DI plugin (ktor-server-di):
     // dependencies are registered once here and injected at module boundaries.
     dependencies {
-        provide { UserRepositoryImpl() }
-        provide { AuthService(resolve(), resolve()) }
+        provide { RoleService(resolve()) }
+        provide<UserRepository> { UserRepositoryImpl() }
+        provide { AuthService(resolve(), resolve(), resolve()) }
     }
 
     // Cross-cutting plugins
     configureSerialization()
     configureStatusPages()
-    val jwtProv: JwtProvider by dependencies
-    configureSecurity(jwtProv)
+    configureSecurity()
     configureRouting()
     configureHttp()
 
     // Feature modules — resolved from the registry, still passed explicitly
     val userService: AuthService by dependencies
-    authModule(userService)
+    val roleService: RoleService by dependencies
+    authModule(userService, roleService)
 }

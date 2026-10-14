@@ -4,5 +4,9 @@ data class User(
     val id: Int,
     val firstName: String,
     val lastName: String,
-    val passwordHash: String
+    val passwordHash: String,
+    val isAdmin: Boolean,
+    val isPollCreator: Boolean,
+    val isTeacher: Boolean,
+    val isStudent: Boolean
 )

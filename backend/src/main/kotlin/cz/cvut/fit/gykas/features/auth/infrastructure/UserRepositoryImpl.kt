@@ -28,11 +28,13 @@ class UserRepositoryImpl : UserRepository {
     override suspend fun findByFirstAndLastName(
         firstName: String, lastName: String, caseSensitive: Boolean
     ): List<User> =
-        (if (caseSensitive) UserEntity.find {
-            (Users.firstName eq firstName) and (Users.lastName eq lastName)
-        } else UserEntity.find {
-            (Users.firstName iLike firstName) and (Users.lastName iLike lastName)
-        }).toList().map(UserEntity::toDomain)
+        dbQuery {
+            (if (caseSensitive) UserEntity.find {
+                (Users.firstName eq firstName) and (Users.lastName eq lastName)
+            } else UserEntity.find {
+                (Users.firstName iLike firstName) and (Users.lastName iLike lastName)
+            }).toList().map(UserEntity::toDomain)
+        }
 
 
     override suspend fun update(

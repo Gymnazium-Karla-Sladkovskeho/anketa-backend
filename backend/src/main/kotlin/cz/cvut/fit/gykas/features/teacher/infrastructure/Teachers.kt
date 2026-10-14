@@ -1,6 +1,7 @@
-package cz.cvut.fit.gykas.entities
+package cz.cvut.fit.gykas.features.teacher.infrastructure
 
-import org.jetbrains.exposed.v1.core.Table
+import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreatorEntity
+import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreators
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
 import org.jetbrains.exposed.v1.dao.IntEntity

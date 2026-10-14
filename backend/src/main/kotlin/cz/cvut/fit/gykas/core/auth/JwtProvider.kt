@@ -3,29 +3,32 @@ package cz.cvut.fit.gykas.core.auth
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
-import io.ktor.server.auth.roles
 import io.ktor.server.config.ApplicationConfig
 import java.util.Date
 
 interface JwtProvider {
-    fun generateToken(authUser: AuthUser): String
+    fun generateToken(authUser: AuthUser): JwtToken
     fun getUser(token: String): AuthUser?
+    val durationSeconds: Int
 }
 
 class JwtProviderImpl(val config: ApplicationConfig) : JwtProvider {
     private val secret = config.property("jwt.secret").getString()
-    private val durationSeconds = 3600
+    override val durationSeconds = 3600
     private val algorithm = Algorithm.HMAC256(secret)
 
-    override fun generateToken(authUser: AuthUser): String {
-        return JWT.create()
-            .withSubject(authUser.username)
-            .withClaim("roles", authUser.roles.joinToString(","))
-            .withIssuedAt(Date(System.currentTimeMillis() + durationSeconds * 1000))
-            .withIssuer(config.property("jwt.issuer").getString())
-            .withAudience(config.property("jwt.audience").getString())
-            .sign(algorithm)
-    }
+    override fun generateToken(authUser: AuthUser): JwtToken =
+        with(
+            JWT.create()
+                .withSubject(authUser.username)
+                .withClaim("roles", authUser.roles.joinToString(","))
+                .withIssuedAt(Date(System.currentTimeMillis() + durationSeconds * 1000))
+                .withIssuer(config.property("jwt.issuer").getString())
+                .withAudience(config.property("jwt.audience").getString())
+                .sign(algorithm)
+        ) {
+            return JwtToken(this, "Bearer", durationSeconds * 1000)
+        }
 
     override fun getUser(token: String): AuthUser? =
         try {
