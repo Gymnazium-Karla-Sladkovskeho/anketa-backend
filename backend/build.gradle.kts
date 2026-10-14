@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.exposed.dao)
     implementation(libs.exposed.jdbc)
     implementation(libs.postgresql)
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:1.5.0")
 
     // Logging
     implementation(libs.logback.classic)
