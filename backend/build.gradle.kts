@@ -36,6 +36,7 @@ dependencies {
     implementation(ktorLibs.server.auth.jwt)
     implementation(ktorLibs.server.swagger)
     implementation(ktorLibs.server.routingOpenapi)
+    implementation("de.mkammerer:argon2-jvm:2.12")
 
     // Database: Exposed (DAO/ORM API) + PostgreSQL
     implementation(libs.exposed.core)

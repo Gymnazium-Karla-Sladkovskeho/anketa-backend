@@ -10,7 +10,10 @@ import cz.cvut.fit.gykas.core.plugins.configureSerialization
 import cz.cvut.fit.gykas.core.plugins.configureStatusPages
 import cz.cvut.fit.gykas.features.auth.infrastructure.UserRepositoryImpl
 import cz.cvut.fit.gykas.features.auth.application.AuthService
+import cz.cvut.fit.gykas.features.auth.application.PasswordHashProvider
+import cz.cvut.fit.gykas.features.auth.infrastructure.ArgonHashProvider
 import cz.cvut.fit.gykas.features.auth.presentation.authModule
+import de.mkammerer.argon2.Argon2Factory
 import io.ktor.server.application.Application
 import io.ktor.server.plugins.di.*
 
@@ -22,9 +25,8 @@ fun Application.module() {
     // Dependency injection via Ktor's built-in DI plugin (ktor-server-di):
     // dependencies are registered once here and injected at module boundaries.
     dependencies {
-        provide<JwtProvider> { JwtProviderImpl(resolve()) }
         provide { UserRepositoryImpl() }
-        provide { AuthService(resolve()) }
+        provide { AuthService(resolve(), resolve()) }
     }
 
     // Cross-cutting plugins
