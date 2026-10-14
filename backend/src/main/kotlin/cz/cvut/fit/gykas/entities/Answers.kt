@@ -3,6 +3,7 @@ package cz.cvut.fit.gykas.entities
 import org.jetbrains.exposed.v1.core.dao.id.CompositeIdTable
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.dao.CompositeEntity
+import org.jetbrains.exposed.v1.core.dao.id.CompositeID
 import org.jetbrains.exposed.v1.dao.CompositeEntityClass
 
 object Answers : CompositeIdTable("answers") {
@@ -14,7 +15,7 @@ object Answers : CompositeIdTable("answers") {
     override val primaryKey = PrimaryKey(question, studentId, user, poll)
 }
 
-class AnswerEntity(id: EntityID<org.jetbrains.exposed.v1.core.dao.id.CompositeID>) : CompositeEntity(id) {
+class AnswerEntity(id: EntityID<CompositeID>) : CompositeEntity(id) {
     companion object : CompositeEntityClass<AnswerEntity>(Answers)
     var question by QuestionEntity referencedOn Answers.question
     var studentId by Answers.studentId
