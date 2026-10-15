@@ -37,7 +37,7 @@ fun Application.configureSecurity() {
     val jwtProvider: JwtProvider by dependencies
 
     authentication {
-        bearer("auth-bearer") {
+        bearer("auth") {
             realm = jwtRealm
 
             authenticate { tokenCredential ->

@@ -5,6 +5,7 @@ data class User(
     val firstName: String,
     val lastName: String,
     val passwordHash: String,
+    val uuid: String,
     val isAdmin: Boolean,
     val isPollCreator: Boolean,
     val isTeacher: Boolean,

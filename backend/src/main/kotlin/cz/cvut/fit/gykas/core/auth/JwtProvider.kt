@@ -20,14 +20,14 @@ class JwtProviderImpl(val config: ApplicationConfig) : JwtProvider {
     override fun generateToken(authUser: AuthUser): JwtToken =
         with(
             JWT.create()
-                .withSubject(authUser.username)
+                .withSubject(authUser.uuid)
                 .withClaim("roles", authUser.roles.joinToString(","))
-                .withIssuedAt(Date(System.currentTimeMillis() + durationSeconds * 1000))
+                .withIssuedAt(Date(System.currentTimeMillis() /*+ durationSeconds * 1000*/))
                 .withIssuer(config.property("jwt.issuer").getString())
                 .withAudience(config.property("jwt.audience").getString())
                 .sign(algorithm)
         ) {
-            return JwtToken(this, "Bearer", durationSeconds * 1000)
+            return JwtToken(this, "Bearer", durationSeconds)
         }
 
     override fun getUser(token: String): AuthUser? =

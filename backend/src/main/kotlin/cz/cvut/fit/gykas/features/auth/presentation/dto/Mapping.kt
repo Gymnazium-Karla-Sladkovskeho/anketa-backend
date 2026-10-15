@@ -10,7 +10,8 @@ fun User.toLoggedInUser(): LoggedInUserResponse {
     val role =
         if (isAdmin) ROLE_ADMIN
         else if (isTeacher) ROLE_TEACHER
-        else ROLE_STUDENT
+        else if (isStudent) ROLE_STUDENT
+        else "guest"
 
     return LoggedInUserResponse(this.firstName, this.lastName, role)
 }

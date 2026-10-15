@@ -13,21 +13,10 @@ class AuthService(private val repository: UserRepository,
 {
     suspend fun getById(id: Int): User? = repository.findById(id)
 
-    suspend fun getByUsername(username: String): User? {
-        val spl = username.split('.')
-        val name = spl
-            .take(2)
+    suspend fun getByUuid(uuid: String): User? {
+        val user = repository.findByUuid(uuid) ?: return null
 
-        val users = repository.findByFirstAndLastName(
-            name[0],
-            name[1],
-            caseSensitive = false)
-
-        if (users.isEmpty()) return null
-        if (users.size == 1) return users.first()
-        if (spl.size == 2) return users.first()
-
-        return repository.findById(spl[2].toIntOrNull() ?: return null)
+        return repository.findById(user.id ?: return null)
     }
 
     suspend fun resetPassword(id: Int, len: Int): String? =
