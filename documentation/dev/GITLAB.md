@@ -66,4 +66,18 @@ sequenceDiagram
   main ->> production:v2
 ```
 
-Feature branches, just like in IDO, will be in the style of `feature/name-of-branch` and for example `fix/name-of-branch`.
+## Branch names
+
+`type/name-of-branch` — the prefix is the commit type of the work (see *Allowed Types*), the name is
+lowercase, words separated by hyphens.
+
+| Prefix | Example |
+| :--- | :--- |
+| **feat/** | `feat/poll-editor` |
+| **fix/** | `fix/login-redirect` |
+| **refactor/** | `refactor/auth-service` |
+| **chore/** | `chore/be-structure` |
+| **docs/** | `docs/agents-md` |
+| **ci/** | `ci/build-pipeline` |
+
+Branches created before this rule (e.g. `feature/auth`, `doc/gitlab-flow`) keep their names.
