@@ -25,7 +25,12 @@ class AuthService(
         }
 
         return with(hashProvider.getRandomPassword(len)) {
-            repository.update(id, null, null, this).let {
+            repository.update(
+                id,
+                null,
+                null,
+                this.let { hashProvider.hashPassword(it) }
+            ).let {
                 if (it == null) return@with null
             }
 

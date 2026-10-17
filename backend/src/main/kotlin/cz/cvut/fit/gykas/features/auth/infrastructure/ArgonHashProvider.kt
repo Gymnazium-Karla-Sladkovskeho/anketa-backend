@@ -22,7 +22,7 @@ class ArgonHashProvider(val argon2: Argon2,
         }
 
         arr.shuffle()
-        return arr.joinToString { "" }
+        return arr.joinToString("")
     }
 
     override fun hashPassword(password: String): String =

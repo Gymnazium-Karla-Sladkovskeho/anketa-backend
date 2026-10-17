@@ -29,10 +29,10 @@ fun Route.loginModule(authService: AuthService, roleService: RoleService) {
         val request = call.receive<LoginRequest>()
 
         val user = authService.getByUuid(request.username)
-            ?: return@post call.respond(HttpStatusCode.NotFound)
+            ?: return@post call.respond(HttpStatusCode.Unauthorized)
 
         if (!authService.verifyPassword(user.id, request.password))
-            return@post call.respond(HttpStatusCode.NotFound)
+            return@post call.respond(HttpStatusCode.Unauthorized)
 
         val roles = roleService.getRoles(user.id)
         val response = authService.createToken(request.username, roles).toLoginResponse()

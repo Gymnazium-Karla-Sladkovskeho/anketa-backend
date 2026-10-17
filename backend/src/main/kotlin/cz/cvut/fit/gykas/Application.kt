@@ -37,10 +37,11 @@ fun Application.module() {
     val roleService: RoleService by dependencies
 
     routing {
-        loginModule(userService, roleService)
+        route("/auth") {
+            loginModule(userService, roleService)
 
-        authenticate("auth") {
-            route("/auth") {
+            authenticate("auth") {
+
                 authModule(userService)
             }
         }
