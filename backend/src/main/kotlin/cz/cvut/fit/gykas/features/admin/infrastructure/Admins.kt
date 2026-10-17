@@ -1,6 +1,5 @@
 package cz.cvut.fit.gykas.features.admin.infrastructure
 
-import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreatorEntity
 import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreators
 import cz.cvut.fit.gykas.features.auth.infrastructure.Users
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
