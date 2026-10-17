@@ -53,22 +53,13 @@ fun Route.authModule(authService: AuthService) {
 
     withRoles(ROLE_ADMIN) {
         post("password/{id}") {
-            val student = "student"
-            val teacher = "teacher"
-
             val id = call.parameters["id"]?.toIntOrNull()
                 ?: return@post call.response.status(HttpStatusCode.BadRequest)
-
-            val type = call.queryParameters["type"]
-                ?: return@post call.response.status(HttpStatusCode.BadRequest)
-
-            if (type != student && type != teacher)
-                return@post call.response.status(HttpStatusCode.BadRequest)
 
             val user = authService.getById(id)
                 ?: return@post call.response.status(HttpStatusCode.NotFound)
 
-            val passwd = authService.resetPassword(id, if (type == student) 5 else 10)
+            val passwd = authService.resetPassword(id)
                 ?: return@post call.response.status(HttpStatusCode.NotFound)
 
             val resp = ResetOthersPasswordResponse(user.firstName, passwd)
