@@ -13,11 +13,7 @@ class AuthService(
 ) {
     suspend fun getById(id: Int): User? = repository.findById(id)
 
-    suspend fun getByUuid(uuid: String): User? {
-        val user = repository.findByUuid(uuid) ?: return null
-
-        return repository.findById(user.id)
-    }
+    suspend fun getByUuid(uuid: String): User? = repository.findByUuid(uuid)
 
     suspend fun resetPassword(id: Int): String? {
         val len = with(repository.findById(id) ?: return null) {
