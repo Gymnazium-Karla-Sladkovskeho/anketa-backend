@@ -3,7 +3,7 @@ package cz.cvut.fit.gykas.features.auth.infrastructure
 import cz.cvut.fit.gykas.features.auth.application.PasswordHashProvider
 import de.mkammerer.argon2.Argon2
 
-class ArgonHashProvider(val argon2: Argon2,
+class ArgonHashProvider(private val argon2: Argon2,
                         val iterations: Int,
                         val memory: Int,
                         val parallelism: Int) : PasswordHashProvider

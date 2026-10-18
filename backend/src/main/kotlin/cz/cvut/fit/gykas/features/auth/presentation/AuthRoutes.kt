@@ -23,6 +23,7 @@ import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import kotlin.math.abs
 
 fun Route.loginModule(authService: AuthService, roleService: RoleService) {
     post {
@@ -76,6 +77,27 @@ fun Route.authModule(authService: AuthService) {
             ?: return@patch call.respond(HttpStatusCode.Unauthorized)
 
         val request = call.receive<SetPasswordRequest>()
+
+        if (request.password.length < 7) {
+            return@patch call.respond(
+                HttpStatusCode.BadRequest,
+                "Password should be at least 7 characters long")
+        }
+
+        var ok = false
+        for (idx in 0 until request.password.length - 1) {
+            if (abs(request.password[idx] - request.password[idx + 1]) != 1) {
+                ok = true
+                break
+            }
+        }
+
+        if (!ok) {
+            return@patch call.respond(
+                HttpStatusCode.BadRequest,
+                "Password is too simple")
+        }
+
         authService.setPassword(user.id, request.password)
             ?: return@patch call.response.status(HttpStatusCode.BadRequest)
 
