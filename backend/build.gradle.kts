@@ -51,6 +51,7 @@ dependencies {
     // Tests
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
+    testImplementation("io.mockk:mockk:1.14.11")
 }
 
 val dotenvFile = file("../.env")
