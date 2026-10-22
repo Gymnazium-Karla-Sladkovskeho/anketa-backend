@@ -63,7 +63,7 @@ fun Route.authModule(authService: AuthService) {
             val passwd = authService.resetPassword(id)
                 ?: return@post call.response.status(HttpStatusCode.NotFound)
 
-            val resp = ResetOthersPasswordResponse(user.firstName, passwd)
+            val resp = ResetOthersPasswordResponse(user.uuid, passwd)
 
             call.respond(HttpStatusCode.Created, resp)
         }
@@ -86,7 +86,7 @@ fun Route.authModule(authService: AuthService) {
 
         var ok = false
         for (idx in 0 until request.password.length - 1) {
-            if (abs(request.password[idx] - request.password[idx + 1]) != 1) {
+            if (abs(request.password[idx] - request.password[idx + 1]) > 1) {
                 ok = true
                 break
             }
