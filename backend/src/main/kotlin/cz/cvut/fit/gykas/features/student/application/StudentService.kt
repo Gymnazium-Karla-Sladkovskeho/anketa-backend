@@ -15,6 +15,7 @@ class StudentService(private val userRepository: UserRepository,
         val newUser = userRepository.create(name, lastName, username, "")
         val newPasswd = authService.resetPassword(newUser.id)
         val classId = 0
-        studentRepository.create(newUser.id, classId)
+        return studentRepository.create(newUser.id, classId)
+
     }
 }

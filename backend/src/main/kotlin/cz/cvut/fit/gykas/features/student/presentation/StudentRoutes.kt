@@ -18,7 +18,7 @@ fun Route.studentModule(studentService: StudentService) {
         post {
             val request = call.receive<CreateStudentRequest>()
 
-            studentService.create()
+            //studentService.create()
         }
 
         put("{id}") {
