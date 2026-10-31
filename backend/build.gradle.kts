@@ -8,8 +8,12 @@ plugins {
     id("io.github.dsdolzhenko.dotenv") version "0.1.0"
 }
 
+// Later files override earlier ones. Use `./gradlew run -Penv=test` to layer
+// blackbox/test.env (test database + port) on top of the shared ../.env —
+// used by the blackbox hurl tests, see blackbox/README.md.
 dotenv {
-    files.set(listOf("../.env"))
+    val envName = providers.gradleProperty("env").orNull
+    files.set(listOf("../.env") + listOfNotNull(envName?.let { "blackbox/$it.env" }))
 }
 
 group = "cz.cvut.fit"
@@ -52,120 +56,5 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
     testImplementation("io.mockk:mockk:1.14.11")
-}
-
-val dotenvFile = file("../.env")
-
-val dotenvValues = dotenvFile.readLines()
-    .mapNotNull { line ->
-        val trimmed = line.trim()
-
-        if (trimmed.isEmpty() || trimmed.startsWith("#")) {
-            null
-        } else {
-            val separator = trimmed.indexOf('=')
-            if (separator < 1) {
-                null
-            } else {
-                val key = trimmed.substring(0, separator).trim()
-                var value = trimmed.substring(separator + 1).trim()
-
-                if (value.length >= 2 &&
-                    ((value.startsWith('"') && value.endsWith('"')) ||
-                            (value.startsWith('\'') && value.endsWith('\'')))
-                ) {
-                    value = value.substring(1, value.length - 1)
-                }
-
-                key to value
-            }
-        }
-    }
-    .toMap()
-
-fun env(name: String): String =
-    providers.environmentVariable(name).orNull
-        ?: dotenvValues[name]
-        ?: error("Missing environment variable: $name")
-
-val backupFile = layout.buildDirectory
-    .file("src/test/db-backup-before-hurl.sql")
-    .get().asFile
-
-val dbUser = env("POSTGRES_USER")
-val dbName = env("POSTGRES_DB")
-val dbPassword = env("POSTGRES_PASSWORD")
-val dbHost = env("POSTGRES_HOST")
-val dbPort = env("POSTGRES_PORT")
-
-val pgEnv = mapOf(
-    "PGPASSWORD" to dbPassword,
-    "PGHOST" to dbHost,
-    "PGPORT" to dbPort
-)
-
-tasks.register<Exec>("backupTestDb") {
-    group = "verification"
-
-    doFirst {
-        backupFile.parentFile.mkdirs()
-    }
-
-    environment(pgEnv)
-
-    commandLine(
-        "pg_dump",
-        "-U", dbUser,
-        "-d", dbName,
-        "-Fc",
-        "-f", backupFile.absolutePath
-    )
-}
-
-tasks.register<Exec>("restoreTestDb") {
-    group = "verification"
-
-    environment(pgEnv)
-
-    commandLine(
-        "pg_restore",
-        "-U", dbUser,
-        "-d", dbName,
-        "--clean",
-        "--if-exists",
-        "--no-owner",
-        backupFile.absolutePath
-    )
-}
-
-tasks.register<Exec>("loadTestDump") {
-    group = "verification"
-
-    environment(pgEnv)
-
-    commandLine(
-        "psql",
-        "-U", dbUser,
-        "-d", dbName,
-        "-v", "ON_ERROR_STOP=1",
-        "-f", "src/test/dump.sql"
-    )
-}
-
-val hurlTest = tasks.register<Exec>("hurlTest") {
-    group = "verification"
-    description = "Runs Hurl black-box tests"
-
-    commandLine(
-        "hurl",
-        "--test",
-        "--very-verbose",
-        "--jobs", "1",
-        "--variable", "baseUrl=http://localhost:8080",
-        "src/test/hurl/"
-    )
-
-    dependsOn("backupTestDb", "loadTestDump")
-    finalizedBy("restoreTestDb")
 }
 

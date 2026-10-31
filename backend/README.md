@@ -402,9 +402,25 @@ The `users` table was also inspected in PostgreSQL (`\d users`): columns `id` (s
 | JVM toolchain    | 21       |
 | PostgreSQL (compose) | 17   |
 
+## Blackbox tests (hurl)
+
+Hurl black-box API tests live in [`blackbox/`](blackbox/README.md), fully outside the
+Gradle build. They run against a dedicated test database (`gykas_test`) on port 8081:
+
+```bash
+# terminal 1 — run the app with the test environment
+# (the dotenv plugin layers blackbox/test.env over ../.env when -Penv=test is given)
+./gradlew run -Penv=test
+
+# terminal 2 — create/reset/seed gykas_test and run the hurl suite
+blackbox/run.sh
+```
+
+Prerequisites: `hurl` and `psql` installed. See `blackbox/README.md` for details.
+
 ## Useful Gradle tasks
 
 | Task             | Description      |
 |------------------|------------------|
 | `./gradlew build`| Build the project|
-| `./gradlew run`  | Run the server   |
+| `./gradlew run`  | Run the server (add `-Penv=test` for the blackbox test environment) |
