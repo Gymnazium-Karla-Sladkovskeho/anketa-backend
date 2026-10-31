@@ -1,7 +1,7 @@
 package cz.cvut.fit.gykas.core.database
 
 import cz.cvut.fit.gykas.entities.Answers
-import cz.cvut.fit.gykas.features.schoolclass.infrastructure.Classes
+import cz.cvut.fit.gykas.features.student.infrastructure.Classes
 import cz.cvut.fit.gykas.entities.CloseQuestionOptions
 import cz.cvut.fit.gykas.entities.PollTemplates
 import cz.cvut.fit.gykas.entities.Polls

@@ -38,6 +38,7 @@ INSERT INTO users (id, first_name, last_name, password_hash, uuid) VALUES
      'jindra');
 
 INSERT INTO classes (id, name) VALUES (1, '3.B');
+INSERT INTO classes (id, name) VALUES (2, '9.A');
 
 INSERT INTO students (id, classes_id) VALUES (1, 1);
 

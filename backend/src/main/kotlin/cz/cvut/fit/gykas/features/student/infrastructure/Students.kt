@@ -1,7 +1,5 @@
 package cz.cvut.fit.gykas.features.student.infrastructure
 
-import cz.cvut.fit.gykas.features.schoolclass.infrastructure.ClassEntity
-import cz.cvut.fit.gykas.features.schoolclass.infrastructure.Classes
 import cz.cvut.fit.gykas.features.auth.infrastructure.UserEntity
 import cz.cvut.fit.gykas.features.auth.infrastructure.Users
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
