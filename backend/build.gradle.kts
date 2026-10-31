@@ -8,8 +8,12 @@ plugins {
     id("io.github.dsdolzhenko.dotenv") version "0.1.0"
 }
 
+// Later files override earlier ones. Use `./gradlew run -Penv=test` to layer
+// blackbox/test.env (test database + port) on top of the shared ../.env —
+// used by the blackbox hurl tests, see blackbox/README.md.
 dotenv {
-    files.set(listOf("../.env"))
+    val envName = providers.gradleProperty("env").orNull
+    files.set(listOf("../.env") + listOfNotNull(envName?.let { "blackbox/$it.env" }))
 }
 
 group = "cz.cvut.fit"
@@ -36,6 +40,7 @@ dependencies {
     implementation(ktorLibs.server.auth.jwt)
     implementation(ktorLibs.server.swagger)
     implementation(ktorLibs.server.routingOpenapi)
+    implementation("de.mkammerer:argon2-jvm:2.12")
 
     // Database: Exposed (DAO/ORM API) + PostgreSQL
     implementation(libs.exposed.core)
@@ -50,4 +55,6 @@ dependencies {
     // Tests
     testImplementation(kotlin("test"))
     testImplementation(ktorLibs.server.testHost)
+    testImplementation("io.mockk:mockk:1.14.11")
 }
+

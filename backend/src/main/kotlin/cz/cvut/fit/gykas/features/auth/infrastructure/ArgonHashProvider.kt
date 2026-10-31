@@ -1,0 +1,43 @@
+package cz.cvut.fit.gykas.features.auth.infrastructure
+
+import cz.cvut.fit.gykas.features.auth.application.PasswordHashProvider
+import de.mkammerer.argon2.Argon2
+import java.security.SecureRandom
+import kotlin.random.asKotlinRandom
+
+class ArgonHashProvider(private val argon2: Argon2,
+                        val iterations: Int,
+                        val memory: Int,
+                        val parallelism: Int) : PasswordHashProvider
+{
+    // Cryptographically secure RNG: generated passwords are real credentials
+    // (initial/reset passwords), so kotlin.random.Random must not be used here.
+    private val random = SecureRandom().asKotlinRandom()
+
+    override fun getRandomPassword(len: Int): String {
+        val nums = '0' .. '9'
+        val letters = 'a' .. 'z'
+        val bigLetters = 'A' .. 'Z'
+        val alphaNum = arrayOf(nums, letters, bigLetters)
+        val special = arrayOf('@','&', '-', '_')
+
+        val arr = Array(len) { 'a' }
+        arr[0] = special.random(random)
+        for (i in 1 until len) {
+            arr[i] = alphaNum.random(random).random(random)
+        }
+
+        arr.shuffle(random)
+        return arr.joinToString("")
+    }
+
+    override fun hashPassword(password: String): String =
+        argon2.hash(iterations,
+            memory,
+            parallelism,
+            password.toCharArray()
+        )
+
+    override fun verify(hash: String, password: String): Boolean =
+        argon2.verify(hash, password.toCharArray())
+}

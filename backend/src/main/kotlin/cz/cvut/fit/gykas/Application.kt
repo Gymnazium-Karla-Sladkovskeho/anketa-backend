@@ -6,32 +6,44 @@ import cz.cvut.fit.gykas.core.plugins.configureRouting
 import cz.cvut.fit.gykas.core.plugins.configureSecurity
 import cz.cvut.fit.gykas.core.plugins.configureSerialization
 import cz.cvut.fit.gykas.core.plugins.configureStatusPages
-import cz.cvut.fit.gykas.features.user.infrastructure.UserRepositoryImpl
-import cz.cvut.fit.gykas.features.user.application.UserService
-import cz.cvut.fit.gykas.features.user.presentation.userModule
+import cz.cvut.fit.gykas.features.auth.infrastructure.UserRepositoryImpl
+import cz.cvut.fit.gykas.features.auth.application.AuthService
+import cz.cvut.fit.gykas.features.auth.application.RoleService
+import cz.cvut.fit.gykas.features.auth.domain.UserRepository
+import cz.cvut.fit.gykas.features.auth.presentation.authModule
+import cz.cvut.fit.gykas.features.auth.presentation.loginModule
 import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.di.*
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 
-// Loaded from application.yaml: cz.cvut.fit.gykas.ApplicationKt.module
 fun Application.module() {
-    // Infrastructure
     DatabaseFactory.init(environment.config)
 
-    // Dependency injection via Ktor's built-in DI plugin (ktor-server-di):
-    // dependencies are registered once here and injected at module boundaries.
     dependencies {
-        provide { UserRepositoryImpl() }
-        provide { UserService(resolve()) }
+        provide { RoleService(resolve()) }
+        provide<UserRepository> { UserRepositoryImpl() }
+        provide { AuthService(resolve(), resolve(), resolve()) }
     }
 
-    // Cross-cutting plugins
     configureSerialization()
     configureStatusPages()
     configureSecurity()
     configureRouting()
     configureHttp()
 
-    // Feature modules — resolved from the registry, still passed explicitly
-    val userService: UserService by dependencies
-    userModule(userService)
+    val userService: AuthService by dependencies
+    val roleService: RoleService by dependencies
+
+    routing {
+        route("/auth") {
+            loginModule(userService, roleService)
+
+            authenticate("auth") {
+
+                authModule(userService)
+            }
+        }
+    }
 }
