@@ -1,4 +1,4 @@
-package cz.cvut.fit.gykas.entities
+package cz.cvut.fit.gykas.features.schoolclass.infrastructure
 
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IntIdTable

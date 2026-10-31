@@ -37,11 +37,12 @@ class UserRepositoryImpl : UserRepository {
     }
 
     override suspend fun create(
-        firstName: String, lastName: String, passwordHash: String
+        firstName: String, lastName: String, username: String, passwordHash: String
     ): User = dbQuery {
         UserEntity.new {
             this.firstName = firstName
             this.lastName = lastName
+            this.uuid = username
             this.passwordHash = passwordHash
         }.toDomain()
     }
