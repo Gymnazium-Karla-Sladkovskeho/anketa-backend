@@ -17,7 +17,8 @@ class AuthService(
 
     suspend fun resetPassword(id: Int): String? {
         val len = with(repository.findById(id) ?: return null) {
-            if (isTeacher) 10 else 7
+            if (isTeacher) PasswordHashProvider.TEACHER_PASSWORD_LEN
+            else PasswordHashProvider.STUDENT_PASSWORD_LEN
         }
 
         return with(hashProvider.getRandomPassword(len)) {
