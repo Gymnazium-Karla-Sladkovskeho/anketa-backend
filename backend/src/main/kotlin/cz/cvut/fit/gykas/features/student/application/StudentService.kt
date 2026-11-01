@@ -30,7 +30,7 @@ class StudentService(
 
         val newPasswd = passwordHashProvider.getRandomPassword(PasswordHashProvider.STUDENT_PASSWORD_LEN)
         val hashedPasswd = passwordHashProvider.hashPassword(newPasswd)
-        val classId = classService.getByName(className)?.id ?: return null
+        val classId = classService.getByName(className)?.id ?: classService.create(className).id
         val newUser = userRepository.create(name, lastName, username, hashedPasswd)
 
         return StudentWithPassword(studentRepository.create(newUser.id, classId), newPasswd)
@@ -64,8 +64,9 @@ class StudentService(
         val classId = classService.getByName(stud.className)?.id
         require(classId != null)
         removeClassIfNoMember(classId)
-        require(userRepository.delete(id))
 
+        require(studentRepository.delete(id))
+        require(userRepository.delete(id))
         return true
     }
 }

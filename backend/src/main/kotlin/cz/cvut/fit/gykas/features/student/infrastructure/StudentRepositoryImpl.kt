@@ -6,6 +6,7 @@ import cz.cvut.fit.gykas.features.auth.infrastructure.toDomain
 import cz.cvut.fit.gykas.features.student.domain.Student
 import cz.cvut.fit.gykas.features.student.domain.StudentRepository
 import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.jdbc.insert
 
 class StudentRepositoryImpl : StudentRepository {
     override suspend fun findAllByClasses(classIds: Array<Int>): Array<Student> = dbQuery {
@@ -22,8 +23,8 @@ class StudentRepositoryImpl : StudentRepository {
         userId: Int, classId: Int
     ): Student = dbQuery {
         StudentEntity.new {
-            this.schoolClass = ClassEntity.findById(classId).let { require(it != null); it }
-            this.user = UserEntity.findById(userId).let { require(it != null); it }
+            this.user = UserEntity[userId]
+            this.schoolClass = ClassEntity[classId]
         }.toDomain()
     }
 
@@ -31,7 +32,7 @@ class StudentRepositoryImpl : StudentRepository {
         userId: Int, classId: Int
     ): Student? = dbQuery {
         StudentEntity.findById(userId)?.apply {
-            this.schoolClass = ClassEntity.findById(classId).let { require(it != null); it }
+            this.schoolClass = ClassEntity[classId]
         }?.toDomain()
     }
 

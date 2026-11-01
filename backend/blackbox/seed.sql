@@ -26,14 +26,14 @@ TRUNCATE TABLE
 RESTART IDENTITY CASCADE;
 
 -- All people below are invented test fixtures, not real persons.
-INSERT INTO users (id, first_name, last_name, password_hash, uuid) VALUES
-    (1, 'Jenda', 'Perníček',
+INSERT INTO users (first_name, last_name, password_hash, uuid) VALUES
+    ('Jenda', 'Perníček',
      '$argon2i$v=19$m=65536,t=10,p=1$ZmRzZmRzZnNkZ2doZ2RzZmZmYmdi$lCmQaHQYrLyGpROzRJdMxw',
      'jenda'),
-    (2, 'Petr', 'Kramný',
+    ( 'Petr', 'Kramný',
      '$argon2i$v=19$m=65536,t=10,p=1$ZmRzZmRzZnNkZ2doZ2RzZmZmYmdi$lCmQaHQYrLyGpROzRJdMxw',
      'kramny'),
-    (3, 'Jindřich', 'ZeSkalice',
+    ('Jindřich', 'ZeSkalice',
      '$argon2i$v=19$m=65536,t=10,p=1$ZmRzZmRzZnNkZ2doZ2RzZmZmYmdi$lCmQaHQYrLyGpROzRJdMxw',
      'jindra');
 

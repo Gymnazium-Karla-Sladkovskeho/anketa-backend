@@ -43,7 +43,7 @@ fun Route.studentModule(studentService: StudentService, authService: AuthService
             val request = call.receive<EditStudentRequest>()
 
             if (!studentService.update(id, request.name, request.lastname, request.`class`))
-                return@put call.respond(HttpStatusCode.BadRequest)
+                return@put call.respond(HttpStatusCode.NotFound)
 
             return@put call.respond(HttpStatusCode.NoContent)
 
@@ -54,15 +54,15 @@ fun Route.studentModule(studentService: StudentService, authService: AuthService
                 ?: return@delete call.respond(HttpStatusCode.BadRequest)
 
             if (studentService.delete(id))
-                return@delete call.respond(HttpStatusCode.NotFound)
+                return@delete call.respond(HttpStatusCode.NoContent)
 
-            return@delete call.respond(HttpStatusCode.NoContent)
+            return@delete call.respond(HttpStatusCode.NotFound)
         }
     }
 
     withRoles(ROLE_POLL_CREATOR, ROLE_TEACHER, ROLE_ADMIN) {
         get {
-            val classes = call.pathParameters["classes"].let {
+            val classes = call.queryParameters["classes"].let {
                 if (it == null) return@get call.respond(HttpStatusCode.BadRequest)
                 if (it.isEmpty()) return@get call.respond(
                     HttpStatusCode.OK,

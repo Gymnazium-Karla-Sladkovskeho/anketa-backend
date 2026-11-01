@@ -10,13 +10,13 @@ import org.jetbrains.exposed.v1.dao.IntEntityClass
 
 object Students : IdTable<Int>("students") {
     override val id = integer("id").entityId().references(Users.id)
-    val classesId = integer("classes_id").references(Classes.id)
+    val classesId = reference("classes_id", Classes)
     override val primaryKey = PrimaryKey(id, name = "pk_students")
 }
 
 class StudentEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<StudentEntity>(Students)
-    var schoolClass by ClassEntity.Companion referencedOn Students.classesId
+    var schoolClass by ClassEntity referencedOn Students.classesId
     var user by UserEntity referencedOn Students.id
 
     fun toDomain() = Student(user.id.value,
