@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.postgresql)
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:1.5.0")
+    implementation("org.jetbrains.exposed:exposed-migration-core:1.5.0")
+    implementation("org.jetbrains.exposed:exposed-migration-jdbc:1.5.0")
 
     // Logging
     implementation(libs.logback.classic)
@@ -57,4 +59,3 @@ dependencies {
     testImplementation(ktorLibs.server.testHost)
     testImplementation("io.mockk:mockk:1.14.11")
 }
-

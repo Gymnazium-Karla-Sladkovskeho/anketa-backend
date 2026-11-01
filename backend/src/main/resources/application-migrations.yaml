@@ -1,0 +1,13 @@
+ktor:
+  deployment:
+    port: "$BACKEND_PORT"
+  application:
+    modules:
+      - cz.cvut.fit.gykas.core.database.MigrationKt.runMigrations
+
+postgres:
+  host: "$POSTGRES_HOST"
+  port: "$POSTGRES_PORT"
+  db: "$POSTGRES_DB"
+  user: "$POSTGRES_USER"
+  password: "$POSTGRES_PASSWORD"
