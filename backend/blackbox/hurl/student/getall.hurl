@@ -9,7 +9,7 @@ HTTP 201
 [Captures]
 token: jsonpath "$.access_token"
 
-GET {{baseUrl}}/student?classes=1,2
+GET {{baseUrl}}/student?classes=3.B,9.A
 Authorization: Bearer {{token}}
 
 HTTP 200
@@ -35,7 +35,7 @@ HTTP 201
 [Captures]
 token: jsonpath "$.access_token"
 
-GET {{baseUrl}}/student?classes=1,2
+GET {{baseUrl}}/student?classes=3.B,9.A
 Authorization: Bearer {{token}}
 
 HTTP 403

@@ -81,6 +81,7 @@ class StudentServiceTests {
         coEvery { sr.create(stud.id, classes[0].id) } returns stud
         coEvery { sr.delete(stud.id) } returns true
         coEvery { sr.findAllByClasses(arrayOf(classes[0].id)) } returns arrayOf(stud)
+        coEvery { sr.findAllByClassesName(arrayOf(classes[0].name)) } returns arrayOf(stud)
 
         coEvery { cs.getAll() } returns classes
         coEvery { cs.getByName(any()) } returns null
@@ -111,7 +112,7 @@ class StudentServiceTests {
     @Test
     fun getsAll() = runBlocking {
         assertContains(
-            studentService.findAllByClasses(arrayOf(classes[0].id)),
+            studentService.findAllByClassesName(arrayOf(classes[0].name)),
             stud
         )
     }

@@ -20,8 +20,8 @@ class StudentService(
             require(classService.delete(classId))
         }
 
-    suspend fun findAllByClasses(classes: Array<Int>) =
-        studentRepository.findAllByClasses(classes)
+    suspend fun findAllByClassesName(classes: Array<String>) =
+        studentRepository.findAllByClassesName(classes)
 
     suspend fun findById(id: Int) = studentRepository.findById(id)
 

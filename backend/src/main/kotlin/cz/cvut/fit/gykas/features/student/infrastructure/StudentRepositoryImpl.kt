@@ -5,8 +5,10 @@ import cz.cvut.fit.gykas.features.auth.infrastructure.UserEntity
 import cz.cvut.fit.gykas.features.auth.infrastructure.toDomain
 import cz.cvut.fit.gykas.features.student.domain.Student
 import cz.cvut.fit.gykas.features.student.domain.StudentRepository
+import org.jetbrains.exposed.v1.core.JoinType
 import org.jetbrains.exposed.v1.core.inList
 import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.select
 
 class StudentRepositoryImpl : StudentRepository {
     override suspend fun findAllByClasses(classIds: Array<Int>): Array<Student> = dbQuery {
@@ -14,6 +16,13 @@ class StudentRepositoryImpl : StudentRepository {
             StudentEntity.find { Students.classesId inList this }.map { it.toDomain() }.toTypedArray()
         }
     }
+
+    override suspend fun findAllByClassesName(classNames: Array<String>): Array<Student> = dbQuery {
+        with((Students innerJoin Classes).select(Students.columns)) {
+            StudentEntity.wrapRows(this).map { it.toDomain() }.toTypedArray()
+        }
+    }
+
 
     override suspend fun findById(id: Int): Student? = dbQuery {
         StudentEntity.findById(id)?.toDomain()

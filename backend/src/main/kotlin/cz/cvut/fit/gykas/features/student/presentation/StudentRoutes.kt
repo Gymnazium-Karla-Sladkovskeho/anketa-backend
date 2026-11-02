@@ -69,14 +69,12 @@ fun Route.studentModule(studentService: StudentService, authService: AuthService
                     arrayOf<StudentResponse>()
                 )
 
-                it.split(',').map {
-                    it.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
-                }.toTypedArray()
+                it.split(',').toTypedArray()
             }
 
             return@get call.respond(
                 HttpStatusCode.OK,
-                studentService.findAllByClasses(classes).map { it.toStudentResponse() }
+                studentService.findAllByClassesName(classes).map { it.toStudentResponse() }
             )
         }
     }
