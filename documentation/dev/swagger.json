@@ -1549,10 +1549,7 @@
           }
         },
         "required": [
-          "id",
-          "name",
-          "lastname",
-          "class"
+          "name"
         ]
       },
       "id_student": {
