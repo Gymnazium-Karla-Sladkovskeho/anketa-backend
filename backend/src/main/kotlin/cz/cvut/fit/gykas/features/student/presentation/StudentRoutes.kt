@@ -3,6 +3,7 @@ package cz.cvut.fit.gykas.features.student.presentation
 import cz.cvut.fit.gykas.core.auth.ROLE_ADMIN
 import cz.cvut.fit.gykas.core.auth.ROLE_POLL_CREATOR
 import cz.cvut.fit.gykas.core.auth.ROLE_TEACHER
+import cz.cvut.fit.gykas.core.auth.ROLE_STUDENT
 import cz.cvut.fit.gykas.core.auth.withRoles
 import cz.cvut.fit.gykas.features.student.application.StudentService
 import cz.cvut.fit.gykas.features.student.presentation.dto.CreateStudentRequest
@@ -79,6 +80,12 @@ fun Route.studentModule(studentService: StudentService, authService: AuthService
         }
     }
 
+
+    /**
+        No roles are required here; even [ROLE_STUDENT] can
+        call this endpoint. I am either POLL_CREATOR or I am
+        viewing my own information; otherwise, a 403 error is returned.
+     */
     get("{id}") {
         val id = call.pathParameters["id"]?.toIntOrNull()
             ?: return@get call.respond(HttpStatusCode.BadRequest)
