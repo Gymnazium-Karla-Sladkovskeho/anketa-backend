@@ -721,6 +721,34 @@
       }
     },
 
+    "/class": {
+      "get": {
+        "tags": ["class"],
+        "summary": "zobrazení tříd",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/class"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+
     "/student": {
       "post": {
         "tags": ["student"],
@@ -1513,6 +1541,17 @@
 
   "components": {
     "schemas": {
+      "class": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
       "id_student": {
         "type": "object",
         "properties": {

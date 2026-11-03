@@ -12,6 +12,10 @@ import cz.cvut.fit.gykas.features.auth.application.RoleService
 import cz.cvut.fit.gykas.features.auth.domain.UserRepository
 import cz.cvut.fit.gykas.features.auth.presentation.authModule
 import cz.cvut.fit.gykas.features.auth.presentation.loginModule
+import cz.cvut.fit.gykas.features.student.application.ClassService
+import cz.cvut.fit.gykas.features.student.domain.ClassRepository
+import cz.cvut.fit.gykas.features.student.infrastructure.ClassRepositoryImpl
+import cz.cvut.fit.gykas.features.student.presentation.classModule
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.di.*
@@ -22,8 +26,10 @@ fun Application.module() {
     DatabaseFactory.init(environment.config)
 
     dependencies {
+        provide { ClassService(resolve()) }
         provide { RoleService(resolve()) }
         provide<UserRepository> { UserRepositoryImpl() }
+        provide<ClassRepository> { ClassRepositoryImpl() }
         provide { AuthService(resolve(), resolve(), resolve()) }
     }
 
@@ -35,14 +41,19 @@ fun Application.module() {
 
     val userService: AuthService by dependencies
     val roleService: RoleService by dependencies
+    val classService: ClassService by dependencies
 
     routing {
         route("/auth") {
             loginModule(userService, roleService)
 
             authenticate("auth") {
-
                 authModule(userService)
+            }
+        }
+        route("/class") {
+            authenticate("auth") {
+                classModule(classService)
             }
         }
     }
