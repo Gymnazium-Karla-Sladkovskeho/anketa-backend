@@ -26,7 +26,11 @@ blackbox-api:
     - name: postgres:18
       alias: postgres
   before_script:
-    - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
+    - apt-get update && apt-get install -y curl ca-certificates
+
+    - VERSION=8.1.0
+    - sudo apt-add-repository -y ppa:lepapareil/hurl
+    - sudo apt install hurl="${VERSION}"
   script:
     - cd backend
     - ./gradlew run -Penv=test &
