@@ -16,6 +16,7 @@ backend-integration-tests:
   stage: test
   image: debian:trixie
   script:
+    - cd backend
     - ./gradlew test
   
 blackbox-api:
