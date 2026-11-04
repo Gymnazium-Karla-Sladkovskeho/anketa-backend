@@ -30,11 +30,11 @@ blackbox-api:
     - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
   script:
     - cd backend
-    - echo "tady 1"
+    - sed -i 's/\r$//' ../.env blackbox/test.env blackbox/run.sh
+    - set -a
     - . ../.env
-    - echo "tady 2"
-    - . blackbox/test.env
-    - echo "tady 3"
+    - . ./blackbox/test.env
+    - set +a
     - ./gradlew run -Penv=test &
-    - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT}/" > /dev/null
-    - ./blackbox/run.sh
+    - curl -sS --retry 90 --retry-delay 2 --retry-connrefused "http://localhost:${BACKEND_PORT}/" > /dev/null
+    - bash blackbox/run.sh
