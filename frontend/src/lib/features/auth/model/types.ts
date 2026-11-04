@@ -1,3 +1,4 @@
 export type Role = 'student' | 'teacher' | 'admin';
-export type User = { id: string; name: string; role: Role; mustChangePassword: boolean };
+// /auth/me does not currently provide an ID or a first-login password-change flag.
+export type User = { name: string; role: Role };
 export type Credentials = { login: string; password: string };

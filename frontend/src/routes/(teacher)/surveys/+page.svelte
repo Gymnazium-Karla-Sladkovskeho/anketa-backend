@@ -1,1 +1,6 @@
-<h1 class="p-8 text-2xl font-bold">My surveys</h1>
+<script lang="ts">
+    import { TeacherHomePage } from '$lib/features/surveys';
+    let { data } = $props();
+</script>
+
+<TeacherHomePage polls={data.polls} failed={data.failed} />
