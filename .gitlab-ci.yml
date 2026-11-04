@@ -12,6 +12,22 @@ workflow:
 default:
   interruptible: true
 
+backend-integration-tests:
+  stage: test
+  image: debian:trixie
+  script:
+    - ./gradlew test
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+      changes:
+        - "backend/**/*"
+      when: manual
+      allow_failure: true
+
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "backend/**/*"
+  
 blackbox-api:
   stage: test
   image: debian:trixie
