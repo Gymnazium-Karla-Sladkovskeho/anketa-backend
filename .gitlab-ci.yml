@@ -21,20 +21,23 @@ backend-integration-tests:
 
 blackbox-api:
   stage: test
-  image: eclipse-temurin:21-alpine
+  # glibc-based image: the Alpine (musl) one crashes in JNA native code
+  image: eclipse-temurin:21
   services:
     - name: postgres:18
       alias: postgres
   variables:
     # Throwaway CI database: any password is accepted ("trust").
-    # The DB name is NOT set here; it is created below from POSTGRES_DB
-    # in backend/blackbox/test.env, so it lives in one place only.
+    # The DB name comes from POSTGRES_DB in backend/blackbox/test.env.
     POSTGRES_USER: user
     POSTGRES_HOST_AUTH_METHOD: trust
+    HURL_VERSION: "8.0.1" # the version your Alpine job installed
   before_script:
     # postgresql-client = psql (used by run.sh) + createdb
-    - apk add curl bash socat postgresql-client
-    - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
+    - apt-get update -qq
+    - apt-get install -y -qq curl ca-certificates socat postgresql-client
+    - curl -fsSL -o /tmp/hurl.deb "https://github.com/Orange-OpenSource/hurl/releases/download/${HURL_VERSION}/hurl_${HURL_VERSION}_amd64.deb"
+    - apt-get install -y -qq /tmp/hurl.deb
   script:
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
     - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
@@ -46,7 +49,7 @@ blackbox-api:
     - . ./blackbox/test.env
     - set +a
 
-    # Create the test database named in test.env (POSTGRES_DB=gykas_test)
+    # Create the test database named in test.env
     - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
 
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
