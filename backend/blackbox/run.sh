@@ -14,9 +14,9 @@ cd "$(dirname "$0")"
 # (tr strips CR — the shared .env may have CRLF line endings.)
 set -a
 # shellcheck source=../../.env
-. <(tr -d '\r' < ../../.env)
+source ../../.env
 # shellcheck source=test.env
-. <(tr -d '\r' < ./test.env)
+source ./test.env
 set +a
 
 export PGPASSWORD="$POSTGRES_PASSWORD"
