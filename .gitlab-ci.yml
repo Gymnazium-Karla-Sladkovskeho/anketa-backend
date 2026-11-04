@@ -22,7 +22,7 @@ backend-integration-tests:
 blackbox-api:
   stage: test
   # glibc-based image: the Alpine (musl) one crashes in JNA native code
-  image: eclipse-temurin:21
+  image: eclipse-temurin:21-jdk-noble
   services:
     - name: postgres:18
       alias: postgres
