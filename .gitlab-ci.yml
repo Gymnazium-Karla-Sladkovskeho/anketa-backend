@@ -25,6 +25,11 @@ blackbox-api:
   services:
     - name: postgres:18
       alias: postgres
+  variables:
+    # hodnoty musí odpovídat tomu, co backend čeká v test.env
+    POSTGRES_USER: <user z test.env>
+    POSTGRES_PASSWORD: <heslo z test.env>
+    POSTGRES_DB: <název DB z test.env>
   before_script:
     - apk add curl bash
     - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
@@ -35,6 +40,18 @@ blackbox-api:
     - . ../.env
     - . ./blackbox/test.env
     - set +a
-    - ./gradlew run -Penv=test &
-    - curl -sS --retry 90 --retry-delay 2 --retry-connrefused "http://localhost:${BACKEND_PORT}/" > /dev/null
+    - export DB_HOST=postgres   # název proměnné podle tvého test.env
+    - ./gradlew run -Penv=test > ../backend.log 2>&1 &
+    - BACKEND_PID=$!
+    - |
+      for i in $(seq 1 90); do
+        kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend spadl:"; tail -n 40 ../backend.log; exit 1; }
+        curl -fs "http://localhost:${BACKEND_PORT}/" > /dev/null && break
+        sleep 2
+      done
+    - curl -fsS "http://localhost:${BACKEND_PORT}/" > /dev/null
     - bash blackbox/run.sh
+  artifacts:
+    when: always
+    paths:
+      - backend.log
