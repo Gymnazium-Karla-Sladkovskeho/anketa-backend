@@ -31,9 +31,10 @@ blackbox-api:
     POSTGRES_PASSWORD: <heslo z test.env>
     POSTGRES_DB: <název DB z test.env>
   before_script:
-    - apk add curl bash
+    - apk add curl bash socat
     - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
   script:
+    - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
     - cd backend
     - sed -i 's/\r$//' ../.env blackbox/test.env blackbox/run.sh
     - set -a
