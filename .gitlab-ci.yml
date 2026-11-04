@@ -31,8 +31,9 @@ blackbox-api:
   script:
     - cd backend
     - . ../.env
+    - echo "tady"
     - . blackbox/test.env
+    - echo "tadyyy 2"
     - ./gradlew run -Penv=test &
-    - echo $BACKEND_PORT
     - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT}/" > /dev/null
     - ./blackbox/run.sh
