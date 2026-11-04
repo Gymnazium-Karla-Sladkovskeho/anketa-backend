@@ -14,7 +14,7 @@ default:
 
 backend-integration-tests:
   stage: test
-  image: debian:trixie
+  image: eclipse-temurin:21
   script:
     - cd backend
     - ./gradlew test
@@ -26,6 +26,8 @@ blackbox-api:
     - name: postgres:18
       alias: postgres
   before_script:
+    - apt-get update && apt-get install -y curl ca-certificates
+
     - export HURL_VERSION=8.1.0
     - curl --location --remote-name "https://github.com/Orange-OpenSource/hurl/releases/download/${HURL_VERSION}/hurl_${HURL_VERSION}_amd64.deb"
     - apt-get install -y "./hurl_${HURL_VERSION}_amd64.deb"
