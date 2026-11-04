@@ -26,19 +26,17 @@ blackbox-api:
     - name: postgres:18
       alias: postgres
   variables:
-    # Throwaway CI database. "trust" = any password is accepted, so the
-    # password in test.env no longer has to match anything here.
+    # Throwaway CI database: any password is accepted ("trust").
+    # The DB name is NOT set here; it is created below from POSTGRES_DB
+    # in backend/blackbox/test.env, so it lives in one place only.
     POSTGRES_USER: user
     POSTGRES_HOST_AUTH_METHOD: trust
-    # TODO: must equal the database name from test.env (the value behind
-    # `postgres.db` in application.yaml). If it is wrong, the backend log
-    # says: FATAL: database "xyz" does not exist -> put "xyz" here.
-    POSTGRES_DB: CHANGE_ME
   before_script:
-    - apk add curl bash socat
+    # postgresql-client = psql (used by run.sh) + createdb
+    - apk add curl bash socat postgresql-client
     - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
   script:
-    # Backend expects Postgres on localhost:5432; the service lives at "postgres"
+    # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
     - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
 
     - cd backend
@@ -47,6 +45,9 @@ blackbox-api:
     - . ../.env
     - . ./blackbox/test.env
     - set +a
+
+    # Create the test database named in test.env (POSTGRES_DB=gykas_test)
+    - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
 
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
     - BACKEND_PID=$!
