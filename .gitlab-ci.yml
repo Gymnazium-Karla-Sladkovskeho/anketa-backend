@@ -33,5 +33,6 @@ blackbox-api:
     - . ../.env
     - . blackbox/test.env
     - ./gradlew run -Penv=test &
-    - curl --retry 30 --retry-delay 2 --retry-connrefused -s http://localhost:${BACKEND_PORT}/ > /dev/null
-    - ./blackboxes/run.sh
+    - echo $BACKEND_PORT
+    - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT}/" > /dev/null
+    - ./blackbox/run.sh
