@@ -1,1 +1,6 @@
-<h1 class="p-8 text-2xl font-bold">Available surveys</h1>
+<script lang="ts">
+    import { StudentHomePage } from '$lib/features/survey-filling';
+    let { data } = $props();
+</script>
+
+<StudentHomePage polls={data.polls} failed={data.failed} />

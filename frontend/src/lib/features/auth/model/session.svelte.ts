@@ -1,4 +1,10 @@
+import { clearAccessToken } from '$lib/core/api';
 import type { User } from './types';
 
-/** In-memory session. Lost on reload until the backend provides a session cookie / token. */
+/** Session and access token are held in memory and lost on reload. */
 export const session = $state<{ user: User | null }>({ user: null });
+
+export function logout() {
+    clearAccessToken();
+    session.user = null;
+}

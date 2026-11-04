@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 760" fill="none">
+  <g fill="#dce8e9" font-family="Bradley Hand, Chalkboard SE, Comic Sans MS, cursive" font-size="29" letter-spacing="1">
+    <text x="42" y="75" transform="rotate(-7 42 75)">a² + b² = c²</text>
+    <text x="380" y="80" transform="rotate(5 380 80)">E = mc²</text>
+    <text x="572" y="178" transform="rotate(-9 572 178)">F = ma</text>
+    <text x="42" y="270" transform="rotate(6 42 270)">sin² α + cos² α = 1</text>
+    <text x="350" y="214" font-size="23" transform="rotate(-6 350 214)">H₂O</text>
+    <text x="452" y="324" transform="rotate(-5 452 324)">(x + y)²</text>
+    <text x="32" y="448" transform="rotate(-8 32 448)">f(x) = x²</text>
+    <text x="282" y="473" font-size="24" transform="rotate(7 282 473)">ΔABC ∼ ΔDEF</text>
+    <text x="598" y="476" transform="rotate(-8 598 476)">π ≈ 3.14</text>
+    <text x="60" y="618" transform="rotate(5 60 618)">v = s / t</text>
+    <text x="350" y="630" transform="rotate(-5 350 630)">∑ xᵢ</text>
+    <text x="564" y="691" font-size="26" transform="rotate(7 564 691)">y = ax + b</text>
+    <text x="46" y="727" font-size="23" transform="rotate(-5 46 727)">α + β + γ = 180°</text>
+    <text x="633" y="55" font-size="24">CO₂</text>
+  </g>
+  <g stroke="#dce8e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m64 175 158 23-111-91-47 68 17-2 7 12"/>
+    <path d="m90 155 12 11-13 16"/>
+    <path d="m409 124 66 18-42 43-24-61 45 38 21-20m-42 43 21-23"/>
+    <g transform="translate(646 268) rotate(12)"><ellipse rx="53" ry="18"/><ellipse rx="53" ry="18" transform="rotate(60)"/><ellipse rx="53" ry="18" transform="rotate(120)"/><circle r="4" fill="#dce8e9"/></g>
+    <g transform="translate(80 330)"><path d="M0 62h152M20 80V0m-5 8 5-8 5 8m119 49 8 5-8 5"/><path d="M34 12q39 94 89 0"/><path d="M56 57v10m35-10v10m35-10v10"/></g>
+    <path d="m248 344 96 10-37-75-59 65m21-17 9 7-9 12"/>
+    <g transform="translate(515 553)"><circle cx="-22" r="37"/><circle cx="22" r="37"/><circle cy="36" r="37"/></g>
+    <path d="m157 549 57-61 47 65-104-4m0 0 24 18 80-14m-47-65 20 16 27 49"/>
+    <path d="M332 691h130m-94-12 29-32 28 33m-28-33v77"/>
+    <path d="m658 564 51-46 35 78-86-32m0 0 13 1 1 12"/>
+    <path d="m555 117 7 23 9-44h122"/>
+    <path d="M57 91q74-6 160-2M389 88l118 11" opacity=".6"/>
+  </g>
+</svg>
