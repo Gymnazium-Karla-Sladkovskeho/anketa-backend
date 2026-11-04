@@ -1,0 +1,57 @@
+stages:
+  - test
+
+# --- ON MR or MAIN (Hotfixes) ---
+
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# auto-cancel redundant pipelines
+default:
+  interruptible: true
+
+backend-integration-tests:
+  stage: test
+  image: eclipse-temurin:21
+  script:
+    - cd backend
+    - ./gradlew test
+  
+blackbox-api:
+  stage: test
+  image: eclipse-temurin:21-alpine
+  services:
+    - name: postgres:18
+      alias: postgres
+  before_script:
+    - apk add curl bash
+    - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
+  script:
+    - bash
+    - cd backend
+    - ./gradlew run -Penv=test &
+
+    - set -a
+    - . <(tr -d '\r' < ../../.env)
+    - . <(tr -d '\r' < ./test.env)
+    - set +a
+
+    - |
+      echo "Waiting for backend..."
+      for i in {1..30}; do
+        if curl -s http://localhost:${BACKEND_PORT}/ > /dev/null; then
+          echo "Backend is UP!"
+          break
+        fi
+        echo "Still waiting ($i/30)..."
+        sleep 2
+        if [ $i -eq 30 ]; then
+          echo "Backend has stayed DOWN! :("
+          exit 1
+        fi
+      done
+
+    - chmod +x blackboxes/run.sh
+    - ./blackboxes/run.sh
