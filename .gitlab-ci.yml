@@ -26,11 +26,9 @@ blackbox-api:
     - name: postgres:18
       alias: postgres
   before_script:
-    - apt-get update && apt-get install -y curl ca-certificates
-
     - VERSION=8.1.0
-    - sudo apt-add-repository -y ppa:lepapareil/hurl
-    - sudo apt install hurl="${VERSION}"
+    - apt-add-repository -y ppa:lepapareil/hurl
+    - apt install hurl="${VERSION}"
   script:
     - cd backend
     - ./gradlew run -Penv=test &
