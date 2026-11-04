@@ -30,11 +30,8 @@ blackbox-api:
     - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
   script:
     - cd backend
-    - ls
-    - ls ..
-    - ls ../..
-    - source ../.env
-    - source blackbox/test.env
+    - . ../.env
+    - . blackbox/test.env
     - ./gradlew run -Penv=test &
     - curl --retry 30 --retry-delay 2 --retry-connrefused -s http://localhost:${BACKEND_PORT}/ > /dev/null
     - ./blackboxes/run.sh
