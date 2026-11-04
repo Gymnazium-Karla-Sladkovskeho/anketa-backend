@@ -1,0 +1,60 @@
+stages:
+  - test
+
+# --- ON MR or MAIN (Hotfixes) ---
+
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# auto-cancel redundant pipelines
+default:
+  interruptible: true
+
+blackbox-api:
+  stage: test
+  image: debian:trixie
+  services:
+    - name: postgres:18
+      alias: postgres
+  before_script:
+    - export HURL_VERSION=8.1.0
+    - curl --location --remote-name "https://github.com/Orange-OpenSource/hurl/releases/download/${HURL_VERSION}/hurl_${HURL_VERSION}_amd64.deb"
+    - apt-get install -y "./hurl_${HURL_VERSION}_amd64.deb"
+  script:
+    - cd backend
+    - ./gradlew run -Penv=test &
+
+    - set -a
+    - . <(tr -d '\r' < ../../.env)
+    - . <(tr -d '\r' < ./test.env)
+    - set +a
+
+    - |
+      echo "Waiting for backend..."
+      for i in {1..30}; do
+        if curl -s http://localhost:${BACKEND_PORT}/ > /dev/null; then
+          echo "Backend is UP!"
+          break
+        fi
+        echo "Still waiting ($i/30)..."
+        sleep 2
+        if [ $i -eq 30 ]; then
+          echo "Backend has stayed DOWN! :("
+          exit 1
+        fi
+      done
+
+    - chmod +x blackboxes/run.sh
+    - ./blackboxes/run.sh
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+      changes:
+        - "backend/**/*"
+      when: manual
+      allow_failure: true
+
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "backend/**/*"
