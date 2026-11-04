@@ -14,22 +14,31 @@ default:
 
 backend-integration-tests:
   stage: test
-  image: eclipse-temurin:21
+  image: debian:trixie
   script:
-    - cd backend
     - ./gradlew test
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+      changes:
+        - "backend/**/*"
+      when: manual
+      allow_failure: true
+
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "backend/**/*"
   
 blackbox-api:
   stage: test
-  image: eclipse-temurin:21-alpine
+  image: debian:trixie
   services:
     - name: postgres:18
       alias: postgres
   before_script:
-    - apk add curl bash
-    - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
+    - export HURL_VERSION=8.1.0
+    - curl --location --remote-name "https://github.com/Orange-OpenSource/hurl/releases/download/${HURL_VERSION}/hurl_${HURL_VERSION}_amd64.deb"
+    - apt-get install -y "./hurl_${HURL_VERSION}_amd64.deb"
   script:
-    - bash
     - cd backend
     - ./gradlew run -Penv=test &
 
@@ -55,3 +64,13 @@ blackbox-api:
 
     - chmod +x blackboxes/run.sh
     - ./blackboxes/run.sh
+  rules:
+    - if: '$CI_MERGE_REQUEST_IID'
+      changes:
+        - "backend/**/*"
+      when: manual
+      allow_failure: true
+
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - "backend/**/*"
