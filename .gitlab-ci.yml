@@ -18,7 +18,7 @@ backend-integration-tests:
   script:
     - cd backend
     - ./gradlew test
-  
+
 blackbox-api:
   stage: test
   image: eclipse-temurin:21-alpine
@@ -26,27 +26,33 @@ blackbox-api:
     - name: postgres:18
       alias: postgres
   variables:
-    # hodnoty musí odpovídat tomu, co backend čeká v test.env
-    POSTGRES_USER: <user z test.env>
-    POSTGRES_PASSWORD: <heslo z test.env>
-    POSTGRES_DB: <název DB z test.env>
+    # Throwaway CI database. "trust" = any password is accepted, so the
+    # password in test.env no longer has to match anything here.
+    POSTGRES_USER: user
+    POSTGRES_HOST_AUTH_METHOD: trust
+    # TODO: must equal the database name from test.env (the value behind
+    # `postgres.db` in application.yaml). If it is wrong, the backend log
+    # says: FATAL: database "xyz" does not exist -> put "xyz" here.
+    POSTGRES_DB: CHANGE_ME
   before_script:
     - apk add curl bash socat
     - apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing hurl
   script:
+    # Backend expects Postgres on localhost:5432; the service lives at "postgres"
     - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
+
     - cd backend
     - sed -i 's/\r$//' ../.env blackbox/test.env blackbox/run.sh
     - set -a
     - . ../.env
     - . ./blackbox/test.env
     - set +a
-    - export DB_HOST=postgres   # název proměnné podle tvého test.env
+
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
     - BACKEND_PID=$!
     - |
       for i in $(seq 1 90); do
-        kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend spadl:"; tail -n 40 ../backend.log; exit 1; }
+        kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend crashed:"; tail -n 40 ../backend.log; exit 1; }
         curl -fs "http://localhost:${BACKEND_PORT}/" > /dev/null && break
         sleep 2
       done
@@ -54,5 +60,6 @@ blackbox-api:
     - bash blackbox/run.sh
   artifacts:
     when: always
+    expire_in: 1 week
     paths:
       - backend.log
