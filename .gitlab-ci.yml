@@ -40,7 +40,7 @@ blackbox-api:
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
     - cd backend
     - . ../.env
-    - . ./blackbox/test.env'
+    - . ./blackbox/test.env
 
     # Create the test database named in test.env
     - export POSTGRES_HOST=postgres
