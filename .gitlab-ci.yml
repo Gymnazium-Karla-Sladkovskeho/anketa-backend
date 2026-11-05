@@ -29,17 +29,17 @@ blackbox-api:
     # Throwaway CI database: any password is accepted ("trust").
     # The DB name comes from POSTGRES_DB in backend/blackbox/test.env.
     POSTGRES_USER: user
+    POSTGRES_HOST: postgres
     POSTGRES_HOST_AUTH_METHOD: trust
     HURL_VERSION: "8.1.0"
   before_script:
     # postgresql-client = psql (used by run.sh) + createdb
     - apt-get update > /dev/null
-    - apt-get install -y curl ca-certificates postgresql-client socat software-properties-common > /dev/null
+    - apt-get install -y curl ca-certificates postgresql-client software-properties-common > /dev/null
     - apt-add-repository -y ppa:lepapareil/hurl > /dev/null
     - apt-get install hurl="${HURL_VERSION}"* > /dev/null
   script:
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
-    - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
     - cd backend
     - . ../.env
     - . ./blackbox/test.env
@@ -47,14 +47,7 @@ blackbox-api:
     # Create the test database named in test.env
     - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
-    - BACKEND_PID=$!
-    - |
-      for i in $(seq 1 90); do
-        kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend crashed:"; tail -n 40 ../backend.log; exit 1; }
-        curl -fs "http://localhost:${BACKEND_PORT}/" > /dev/null && break
-        sleep 2
-      done
-    - curl -fsS "http://localhost:${BACKEND_PORT}/" > /dev/null
+    - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT:-8081}/" > /dev/null
     - ./blackbox/run.sh
   #artifacts:
   #  when: always
