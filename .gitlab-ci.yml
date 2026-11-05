@@ -49,8 +49,8 @@ blackbox-api:
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
     - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT:-8081}/" > /dev/null
     - ./blackbox/run.sh
-  #artifacts:
-  #  when: always
-  #  expire_in: 1 week
-  #  paths:
-  #    - backend.log
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - backend.log
