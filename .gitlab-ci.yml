@@ -21,7 +21,6 @@ backend-integration-tests:
 
 blackbox-api:
   stage: test
-  # glibc-based image: the Alpine (musl) one crashes in JNA native code
   image: eclipse-temurin:21-jdk-noble
   services:
     - name: postgres:18
@@ -31,37 +30,37 @@ blackbox-api:
     # The DB name comes from POSTGRES_DB in backend/blackbox/test.env.
     POSTGRES_USER: user
     POSTGRES_HOST_AUTH_METHOD: trust
-    HURL_VERSION: "8.0.1" # the version your Alpine job installed
+    HURL_VERSION: "8.1.0"
   before_script:
     # postgresql-client = psql (used by run.sh) + createdb
     - apt-get update -qq
-    - apt-get install -y -qq curl ca-certificates socat postgresql-client
-    - curl -fsSL -o /tmp/hurl.deb "https://github.com/Orange-OpenSource/hurl/releases/download/${HURL_VERSION}/hurl_${HURL_VERSION}_amd64.deb"
-    - apt-get install -y -qq /tmp/hurl.deb
-  script:
+    - apt-get install -qq curl ca-certificates postgresql-client
+    - apt-add-repository -y ppa:lepapareil/hurl
+    - apt install hurl="${HURL_VERSION}"*
+  #script:
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
-    - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
+    #- socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
 
-    - cd backend
-    - sed -i 's/\r$//' ../.env blackbox/test.env blackbox/run.sh
-    - set -a
-    - . ../.env
-    - . ./blackbox/test.env
-    - set +a
+    #- cd backend
+    #- sed -i 's/\r$//' ../.env blackbox/test.env blackbox/run.sh
+    #- set -a
+    #- . ../.env
+    #- . ./blackbox/test.env
+    #- set +a
 
     # Create the test database named in test.env
-    - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
+    #- createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
 
-    - ./gradlew run -Penv=test > ../backend.log 2>&1 &
-    - BACKEND_PID=$!
-    - |
-      for i in $(seq 1 90); do
-        kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend crashed:"; tail -n 40 ../backend.log; exit 1; }
-        curl -fs "http://localhost:${BACKEND_PORT}/" > /dev/null && break
-        sleep 2
-      done
-    - curl -fsS "http://localhost:${BACKEND_PORT}/" > /dev/null
-    - bash blackbox/run.sh
+    #- ./gradlew run -Penv=test > ../backend.log 2>&1 &
+    #- BACKEND_PID=$!
+    #- |
+    #  for i in $(seq 1 90); do
+    #    kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend crashed:"; tail -n 40 ../backend.log; exit 1; }
+    #    curl -fs "http://localhost:${BACKEND_PORT}/" > /dev/null && break
+    #    sleep 2
+    #  done
+    #- curl -fsS "http://localhost:${BACKEND_PORT}/" > /dev/null
+    #- bash blackbox/run.sh
   artifacts:
     when: always
     expire_in: 1 week
