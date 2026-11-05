@@ -2,7 +2,6 @@ stages:
   - test
 
 # --- ON MR or MAIN (Hotfixes) ---
-
 workflow:
   rules:
     - if: $CI_MERGE_REQUEST_IID
@@ -29,22 +28,22 @@ blackbox-api:
     # Throwaway CI database: any password is accepted ("trust").
     # The DB name comes from POSTGRES_DB in backend/blackbox/test.env.
     POSTGRES_USER: user
-    POSTGRES_HOST: postgres
     POSTGRES_HOST_AUTH_METHOD: trust
     HURL_VERSION: "8.1.0"
   before_script:
-    # postgresql-client = psql (used by run.sh) + createdb
-    - apt-get update > /dev/null
-    - apt-get install -y curl ca-certificates postgresql-client software-properties-common > /dev/null
-    - apt-add-repository -y ppa:lepapareil/hurl > /dev/null
-    - apt-get install hurl="${HURL_VERSION}"* > /dev/null
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt-get update -qq > /dev/null
+    - apt-get install -y -qq curl ca-certificates postgresql-client software-properties-common > /dev/null
+    - apt-add-repository -y ppa:lepapareil/hurl > /dev/null 2>&1
+    - apt-get install -y -qq hurl="${HURL_VERSION}"* > /dev/null
   script:
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
     - cd backend
     - . ../.env
-    - . ./blackbox/test.env
+    - . ./blackbox/test.env'
 
     # Create the test database named in test.env
+    - export POSTGRES_HOST=postgres
     - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
     - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT:-8081}/" > /dev/null
