@@ -25,7 +25,7 @@ POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 POSTGRES_USER="${POSTGRES_USER:-postgres}"
 POSTGRES_DB="${POSTGRES_DB:-gykas_test}"
 
-PSQL=(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -v ON_ERROR_STOP=1)
+PSQL=(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "postgres" -v ON_ERROR_STOP=1)
 
 # Safety: refuse to run against anything but the dedicated test database.
 if [[ "$POSTGRES_DB" != gykas_test ]]; then
