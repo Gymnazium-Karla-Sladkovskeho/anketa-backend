@@ -34,7 +34,7 @@ blackbox-api:
   before_script:
     # postgresql-client = psql (used by run.sh) + createdb
     - apt-get update -qq
-    - apt-get install -qq curl ca-certificates postgresql-client
+    - apt-get install -y -qq curl ca-certificates postgresql-client software-properties-common
     - apt-add-repository -y ppa:lepapareil/hurl
     - apt install hurl="${HURL_VERSION}"*
   script:
@@ -62,8 +62,8 @@ blackbox-api:
     #  done
     #- curl -fsS "http://localhost:${BACKEND_PORT}/" > /dev/null
     #- bash blackbox/run.sh
-  artifacts:
-    when: always
-    expire_in: 1 week
-    paths:
-      - backend.log
+  #artifacts:
+  #  when: always
+  #  expire_in: 1 week
+  #  paths:
+  #    - backend.log
