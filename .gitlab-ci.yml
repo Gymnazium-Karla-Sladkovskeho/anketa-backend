@@ -46,10 +46,16 @@ blackbox-api:
 
     # Create the test database named in test.env
     - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
-    - ./gradlew run -Penv=test > ../backend.log &
-    - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT}/"
-    - echo yay
-    #- bash blackbox/run.sh
+    - ./gradlew run -Penv=test > ../backend.log 2>&1 &
+    - BACKEND_PID=$!
+    - |
+      for i in $(seq 1 90); do
+        kill -0 $BACKEND_PID 2>/dev/null || { echo "Backend crashed:"; tail -n 40 ../backend.log; exit 1; }
+        curl -fs "http://localhost:${BACKEND_PORT}/" > /dev/null && break
+        sleep 2
+      done
+    - curl -fsS "http://localhost:${BACKEND_PORT}/" > /dev/null
+    - ./blackbox/run.sh
   #artifacts:
   #  when: always
   #  expire_in: 1 week
