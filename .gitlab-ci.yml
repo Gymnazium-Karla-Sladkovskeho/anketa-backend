@@ -39,7 +39,7 @@ blackbox-api:
     - apt-get install hurl="${HURL_VERSION}"* > /dev/null
   script:
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
-    #- socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
+    - socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
     - cd backend
     - . ../.env
     - . ./blackbox/test.env
