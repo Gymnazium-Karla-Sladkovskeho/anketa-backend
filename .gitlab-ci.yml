@@ -46,6 +46,7 @@ blackbox-api:
     - export POSTGRES_HOST=postgres
     - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
+    - cat ../backend.log
     - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT:-8081}/" > /dev/null
     - ./blackbox/run.sh
   artifacts:
