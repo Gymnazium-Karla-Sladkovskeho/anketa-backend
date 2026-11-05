@@ -37,7 +37,8 @@ blackbox-api:
     - apt-get install -qq curl ca-certificates postgresql-client
     - apt-add-repository -y ppa:lepapareil/hurl
     - apt install hurl="${HURL_VERSION}"*
-  #script:
+  script:
+    - echo from pipeline yay
     # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
     #- socat TCP-LISTEN:5432,fork,reuseaddr TCP:postgres:5432 &
 
