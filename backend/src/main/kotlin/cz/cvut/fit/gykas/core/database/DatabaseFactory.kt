@@ -9,7 +9,7 @@ import cz.cvut.fit.gykas.entities.Questions
 import cz.cvut.fit.gykas.entities.StudentLists
 import cz.cvut.fit.gykas.entities.StudentListsStudents
 import cz.cvut.fit.gykas.features.admin.infrastructure.Admins
-import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreators
+import cz.cvut.fit.gykas.features.pollcreator.infrastructure.PollCreators
 import cz.cvut.fit.gykas.features.auth.infrastructure.Users
 import cz.cvut.fit.gykas.features.student.infrastructure.Students
 import cz.cvut.fit.gykas.features.teacher.infrastructure.Teachers

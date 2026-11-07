@@ -18,11 +18,10 @@ class StudentEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<StudentEntity>(Students)
     var schoolClass by ClassEntity referencedOn Students.classesId
     var user by UserEntity referencedOn Students.id
-
-    fun toDomain() = Student(user.id.value,
-        user.firstName,
-        user.lastName,
-        schoolClass.name,
-        user.uuid)
-
 }
+
+fun StudentEntity.toDomain() = Student(user.id.value,
+    user.firstName,
+    user.lastName,
+    schoolClass.name,
+    user.uuid)

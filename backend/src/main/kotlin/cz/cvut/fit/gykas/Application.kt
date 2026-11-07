@@ -12,6 +12,8 @@ import cz.cvut.fit.gykas.features.auth.application.RoleService
 import cz.cvut.fit.gykas.features.auth.domain.UserRepository
 import cz.cvut.fit.gykas.features.auth.presentation.authModule
 import cz.cvut.fit.gykas.features.auth.presentation.loginModule
+import cz.cvut.fit.gykas.features.pollcreator.domain.PollCreatorRepository
+import cz.cvut.fit.gykas.features.pollcreator.infrastructure.PollCreatorRepositoryImpl
 import cz.cvut.fit.gykas.features.student.application.ClassService
 import cz.cvut.fit.gykas.features.student.application.StudentService
 import cz.cvut.fit.gykas.features.student.domain.ClassRepository
@@ -48,10 +50,12 @@ fun Application.module() {
             TeacherService(
                 resolve(),
                 resolve(),
+                resolve(),
                 resolve()
             )
         }
         provide<TeacherRepository> { TeacherRepositoryImpl() }
+        provide<PollCreatorRepository> { PollCreatorRepositoryImpl() }
         provide<UserRepository> { UserRepositoryImpl() }
         provide<ClassRepository> { ClassRepositoryImpl() }
         provide<StudentRepository> { StudentRepositoryImpl() }
