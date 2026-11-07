@@ -600,7 +600,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/id_teacher"
+                    "$ref": "#/components/schemas/id_teacher_br_scroll"
                   }
                 }
               }
@@ -1549,7 +1549,10 @@
           }
         },
         "required": [
-          "name"
+          "id",
+          "name",
+          "lastname",
+          "class"
         ]
       },
       "id_student": {
@@ -1620,6 +1623,33 @@
         ]
       },
 
+      "id_teacher_br_scroll": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type":"number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "payload": {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/id_teacher"
+            }
+          }
+
+        },
+        "required": [
+          "page",
+          "totalPage",
+          "pageSize",
+          "payload"
+        ]
+      },
       "id_teacher": {
         "type": "object",
         "properties": {

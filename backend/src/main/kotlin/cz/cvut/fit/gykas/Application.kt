@@ -20,6 +20,10 @@ import cz.cvut.fit.gykas.features.student.infrastructure.ClassRepositoryImpl
 import cz.cvut.fit.gykas.features.student.infrastructure.StudentRepositoryImpl
 import cz.cvut.fit.gykas.features.student.presentation.classModule
 import cz.cvut.fit.gykas.features.student.presentation.studentModule
+import cz.cvut.fit.gykas.features.teacher.application.TeacherService
+import cz.cvut.fit.gykas.features.teacher.domain.TeacherRepository
+import cz.cvut.fit.gykas.features.teacher.infrastructure.TeacherRepositoryImpl
+import cz.cvut.fit.gykas.features.teacher.presentation.teacherModule
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.di.*
@@ -40,6 +44,14 @@ fun Application.module() {
                 resolve()
             )
         }
+        provide {
+            TeacherService(
+                resolve(),
+                resolve(),
+                resolve()
+            )
+        }
+        provide<TeacherRepository> { TeacherRepositoryImpl() }
         provide<UserRepository> { UserRepositoryImpl() }
         provide<ClassRepository> { ClassRepositoryImpl() }
         provide<StudentRepository> { StudentRepositoryImpl() }
@@ -56,6 +68,7 @@ fun Application.module() {
     val roleService: RoleService by dependencies
     val classService: ClassService by dependencies
     val studentService: StudentService by dependencies
+    val teacherService: TeacherService by dependencies
 
     routing {
         route("/auth") {
@@ -73,6 +86,11 @@ fun Application.module() {
         route("/student") {
             authenticate("auth") {
                 studentModule(studentService, authService)
+            }
+        }
+        route("/teacher") {
+            authenticate("auth") {
+                teacherModule(teacherService, authService)
             }
         }
     }

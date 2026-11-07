@@ -4,6 +4,8 @@ import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreatorEntity
 import cz.cvut.fit.gykas.features.auth.infrastructure.PollCreators
 import cz.cvut.fit.gykas.features.auth.infrastructure.UserEntity
 import cz.cvut.fit.gykas.features.auth.infrastructure.Users
+import cz.cvut.fit.gykas.features.student.infrastructure.Students
+import cz.cvut.fit.gykas.features.teacher.domain.Teacher
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.dao.id.IdTable
 import org.jetbrains.exposed.v1.dao.IntEntity
@@ -21,4 +23,12 @@ object Teachers : IdTable<Int>("teachers") {
 class TeacherEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TeacherEntity>(Teachers)
     var isActive by Teachers.isActive
+    var user by UserEntity referencedOn Teachers.id
+
+    fun toDomain() = Teacher(
+        id.value,
+        user.firstName,
+        user.lastName,
+        user.uuid,
+        isActive)
 }
