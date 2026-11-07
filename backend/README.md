@@ -39,6 +39,36 @@ API docs (Swagger UI) are at <http://localhost:8080/openapi>, static content dem
 
 ---
 
+## Database migrations
+
+The database schema is defined in Exposed table definitions.
+
+### Generating migration scripts
+
+Migration scripts can be generated using the `runMigrations` Ktor module. This compares the current database schema with the Exposed table definitions and generates the corresponding SQL migration script.
+
+1. Make sure PostgreSQL is running and the database connection is configured in the root `.env` file.
+2. Run the migration module:
+
+   ```bash
+   cd backend
+   ./gradlew run --args="-config=application-migrations.yaml"
+   ```
+
+3. The generated SQL scripts are stored in:
+
+   ```text
+   backend/src/main/resources/db/migration/
+   ```
+
+4. Review the generated SQL script before applying it to the database.
+
+**Important:**
+- Generating a migration script does not apply it to the database.
+- SQL migrations must currently be applied manually.
+- Always review generated SQL, especially statements that drop or modify existing columns or tables.
+- Do not run the migration module as part of the normal backend startup.
+
 ## How this project was created (exact commands)
 
 1. **Generated** with the [Ktor Project Generator](https://start.ktor.io)

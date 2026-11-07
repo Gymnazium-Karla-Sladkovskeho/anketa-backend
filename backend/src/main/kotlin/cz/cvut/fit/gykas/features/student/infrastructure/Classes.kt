@@ -7,7 +7,7 @@ import org.jetbrains.exposed.v1.dao.IntEntity
 import org.jetbrains.exposed.v1.dao.IntEntityClass
 
 object Classes : IntIdTable("classes", "id") {
-    val name = text("name")
+    val name = text("name").uniqueIndex()
 }
 
 class ClassEntity(id: EntityID<Int>) : IntEntity(id) {
