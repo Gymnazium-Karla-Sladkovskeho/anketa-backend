@@ -5,6 +5,8 @@ import cz.cvut.fit.gykas.core.pagination.PageRequest
 import cz.cvut.fit.gykas.features.auth.application.PasswordHashProvider
 import cz.cvut.fit.gykas.features.auth.domain.User
 import cz.cvut.fit.gykas.features.auth.domain.UserRepository
+import cz.cvut.fit.gykas.features.pollcreator.domain.PollCreator
+import cz.cvut.fit.gykas.features.pollcreator.domain.PollCreatorRepository
 import cz.cvut.fit.gykas.features.teacher.application.TeacherService
 import cz.cvut.fit.gykas.features.teacher.domain.Teacher
 import cz.cvut.fit.gykas.features.teacher.domain.TeacherRepository
@@ -58,6 +60,11 @@ class TeacherServiceTests {
         val ur = mockk<UserRepository>()
         val php = mockk<PasswordHashProvider>()
         val tr = mockk<TeacherRepository>()
+        val pcr = mockk<PollCreatorRepository>()
+
+        coEvery { pcr.create(1) } returns PollCreator(1)
+        coEvery { pcr.create(2) } returns PollCreator(2)
+        coEvery { pcr.delete(any()) } returns true
 
         coEvery { ur.findAll() } returns users.toList()
         coEvery { ur.findById(any()) } returns null
@@ -93,7 +100,7 @@ class TeacherServiceTests {
         coEvery { tr.delete(teacher.id) } returns true
 
         teacherService = TeacherService(
-            ur, php, tr
+            ur, php, tr, pcr
         )
     }
 
