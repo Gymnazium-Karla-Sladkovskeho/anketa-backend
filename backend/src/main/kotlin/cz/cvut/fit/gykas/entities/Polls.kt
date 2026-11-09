@@ -10,7 +10,7 @@ import org.jetbrains.exposed.v1.datetime.date
 
 object Polls : IntIdTable("polls", "id") {
     val pollCreator = reference("poll_creators_id", PollCreators)
-    val studentList = optReference("student_lists_id", StudentLists)
+    val studentList = reference("student_lists_id", StudentLists)
     val name = text("name")
     val startDate = date("start_date")
     val endDate = date("end_date")
@@ -19,7 +19,7 @@ object Polls : IntIdTable("polls", "id") {
 class PollEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<PollEntity>(Polls)
     var pollCreator by PollCreatorEntity referencedOn Polls.pollCreator
-    var studentList by StudentListEntity optionalReferencedOn Polls.studentList
+    var studentList by StudentListEntity referencedOn Polls.studentList
     var name by Polls.name
     var startDate by Polls.startDate
     var endDate by Polls.endDate
