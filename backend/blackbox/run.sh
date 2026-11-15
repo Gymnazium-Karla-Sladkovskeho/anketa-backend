@@ -10,22 +10,19 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-# Same layering as the app: shared repo-root .env first, test.env overrides.
-# (tr strips CR — the shared .env may have CRLF line endings.)
+# Same layering as the app: shared repo-root .env first, test.env overrides,
+# and variables already set in the environment (e.g. by CI) win over both.
+env_override=$(export -p)
 set -a
 # shellcheck source=../../.env
 source ../../.env
 # shellcheck source=test.env
 source ./test.env
 set +a
+eval "$env_override"
 
-# Use variable from CI or fallback to .env/default
-POSTGRES_HOST="${POSTGRES_HOST:-localhost}"
-POSTGRES_PORT="${POSTGRES_PORT:-5432}"
-POSTGRES_USER="${POSTGRES_USER:-postgres}"
-POSTGRES_DB="${POSTGRES_DB:-gykas_test}"
-
-PSQL=(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "postgres" -v ON_ERROR_STOP=1)
+export PGPASSWORD="$POSTGRES_PASSWORD"
+PSQL=(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -v ON_ERROR_STOP=1)
 
 # Safety: refuse to run against anything but the dedicated test database.
 if [[ "$POSTGRES_DB" != gykas_test ]]; then

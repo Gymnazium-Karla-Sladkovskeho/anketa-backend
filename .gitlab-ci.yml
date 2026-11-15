@@ -26,9 +26,14 @@ blackbox-api:
       alias: postgres
   variables:
     # Throwaway CI database: any password is accepted ("trust").
-    # The DB name comes from POSTGRES_DB in backend/blackbox/test.env.
+    # Passed to both the job and the postgres service: the service creates
+    # POSTGRES_DB on startup, and real env vars win over .env / test.env
+    # (in the backend and in run.sh), so everything connects to "postgres".
+    # POSTGRES_DB must match test.env (run.sh refuses any other database).
     POSTGRES_USER: user
     POSTGRES_HOST_AUTH_METHOD: trust
+    POSTGRES_HOST: postgres
+    POSTGRES_DB: gykas_test
     HURL_VERSION: "8.1.0"
   before_script:
     - export DEBIAN_FRONTEND=noninteractive
@@ -37,18 +42,13 @@ blackbox-api:
     - apt-add-repository -y ppa:lepapareil/hurl > /dev/null 2>&1
     - apt-get install -y -qq hurl="${HURL_VERSION}"* > /dev/null
   script:
-    # Backend and run.sh expect Postgres on localhost:5432; the service is "postgres"
+    # Do not source ../.env here: exported .env values would override the
+    # CI variables above (POSTGRES_HOST=localhost).
     - cd backend
-    - . ../.env
-    - . ./blackbox/test.env
-
-    # Create the test database named in test.env
-    - export POSTGRES_HOST=postgres
-    - createdb -h postgres -U "$POSTGRES_USER" "$POSTGRES_DB"
     - ./gradlew run -Penv=test > ../backend.log 2>&1 &
-    - curl --retry 30 --retry-delay 2 --retry-connrefused -s "http://localhost:${BACKEND_PORT:-8081}/" > /dev/null
+    # Wait for the backend (cold Gradle build), up to 60 x 4 s.
+    - curl -fsS --retry 60 --retry-delay 4 --retry-all-errors "http://localhost:8081/" > /dev/null
     - ./blackbox/run.sh
-    - cat ../backend.log
   artifacts:
     when: always
     expire_in: 1 week
