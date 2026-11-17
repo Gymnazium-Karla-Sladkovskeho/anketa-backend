@@ -34,7 +34,6 @@ class TeacherRepositoryImpl : TeacherRepository {
         Teachers.deleteWhere {
             Teachers.id eq id
         } > 0
-        //StudentEntity.findById(id)?.also { it.delete() } != null
     }
 
     override suspend fun update(
@@ -42,19 +41,8 @@ class TeacherRepositoryImpl : TeacherRepository {
         active: Boolean
     ): Teacher? = dbQuery {
         val entity = TeacherEntity.findById(userId) ?: return@dbQuery null
-
         entity.isActive = active
 
-        Teacher(
-            entity.id.value,
-            entity.pollCreator.user.firstName,
-            entity.pollCreator.user.lastName,
-            entity.pollCreator.user.uuid,
-            entity.isActive
-        )
-
-        /*TeacherEntity.findById(userId)?.apply {
-            this.isActive = active
-        }?.toDomain()*/
+        entity.toDomain()
     }
 }
